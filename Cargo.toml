@@ -1,0 +1,23 @@
+[package]
+name = "geoip-grpc"
+version = "0.1.0"
+authors = ["Takeru Sato <type.in.type@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+futures = "0.1"
+grpcio = "0.5"
+protobuf = "2.14"
+spin = "0.5.2"
+maxminddb = "0.13"
+
+[build-dependencies]
+protoc-grpcio = "1.2"
+
+[[example]]
+name = "server"
+path = "examples/src/server.rs"
+
+[[example]]
+name = "client"
+path = "examples/src/client.rs"
