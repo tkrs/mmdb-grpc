@@ -20,39 +20,35 @@ impl<T: AsRef<[u8]>> CityService<T> {
 
 impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
     fn lookup(&mut self, ctx: RpcContext, req: Message, sink: UnarySink<CityReply>) {
-        if let Some(ip) = req.ip.parse().ok() {
-            match (*self.0).read().lookup::<geoip2::City>(ip) {
-                Ok(a) => {
-                    let mut ns = HashSet::with_capacity(req.locales.len());
-                    for n in req.locales {
-                        ns.insert(n.to_string());
-                    }
-                    let reply = CityReply::from(WrappedCity(a, ns));
-                    let f = sink
-                        .success(reply.clone())
-                        .map_err(move |err| eprintln!("failed to reply: {:?}", err));
-                    ctx.spawn(f)
-                }
-                Err(err) => {
-                    let status = convert_error(err);
-                    let f = sink
-                        .fail(status)
-                        .map_err(move |e| eprintln!("failed to reply {:?}: {:?}", req, e));
-                    ctx.spawn(f)
-                }
-            }
-        } else {
-            let f = sink
-                .fail(RpcStatus::new(
+        let Message { ip, locales, .. } = req;
+        let result = ip
+            .parse()
+            .map_err(|_| {
+                RpcStatus::new(
                     RpcStatusCode::INVALID_ARGUMENT,
-                    Some(format!(
-                        "The request must be IP address but given '{}'",
-                        req.ip
-                    )),
-                ))
-                .map_err(move |e| eprintln!("failed to reply {:?}: {:?}", req, e));
-            ctx.spawn(f)
-        }
+                    Some(format!("The request must be IP address but given '{}'", ip)),
+                )
+            })
+            .and_then(|ip| {
+                (*self.0)
+                    .read()
+                    .lookup::<geoip2::City>(ip)
+                    .map_err(|err| convert_error(err))
+            })
+            .map(|city| {
+                let mut ns = HashSet::with_capacity(locales.len());
+                for n in locales {
+                    ns.insert(n.to_string());
+                }
+                CityReply::from(WrappedCity(city, ns))
+            });
+
+        let f = match result {
+            Ok(reply) => sink.success(reply),
+            Err(status) => sink.fail(status),
+        };
+
+        ctx.spawn(f.map_err(move |err| eprintln!("failed to reply, cause: {:?}", err)))
     }
 }
 
@@ -282,9 +278,7 @@ fn filter_locales<'a>(
     };
     let mut h: HashMap<String, String> = HashMap::with_capacity(cap);
     for (k, v) in names.into_iter() {
-        if filter.contains(&k) {
-            h.insert(k, v);
-        } else if filter.is_empty() {
+        if filter.is_empty() || filter.contains(&k) {
             h.insert(k, v);
         }
     }

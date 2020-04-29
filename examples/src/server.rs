@@ -50,7 +50,7 @@ fn main() {
     server.start();
 
     println!(
-        "start mmdb-grpc server listening on {}:{}",
+        "started mmdb-grpc server listening on {}:{}",
         opts.host(),
         opts.port()
     );
