@@ -3,7 +3,7 @@ use crossbeam_channel::{bounded, select, Receiver};
 use env_logger;
 use futures::Future;
 use grpcio::{Environment, ServerBuilder};
-use log::info;
+use log::{error, info};
 use maxminddb as mmdb;
 use mmdb_grpc::proto::geoip2_grpc;
 use mmdb_grpc::CityService;
@@ -21,6 +21,10 @@ struct Opts {
     port: u16,
     #[clap(short = "f", long = "file")]
     mmdb_path: String,
+    #[clap(long = "completion-queue-count", default_value = "1")]
+    completion_queue_count: usize,
+    #[clap(long = "slots-per-cq")]
+    slots_per_cq: Option<usize>,
 }
 
 impl Opts {
@@ -33,6 +37,9 @@ impl Opts {
     fn port(&self) -> u16 {
         self.port
     }
+    fn completion_queue_count(&self) -> usize {
+        self.completion_queue_count
+    }
 }
 
 fn main() {
@@ -43,13 +50,18 @@ fn main() {
     let reader = mmdb::Reader::open_readfile(opts.mmdb_path()).unwrap();
     let mmdb = Arc::new(RwLock::new(reader));
 
-    let env = Arc::new(Environment::new(1));
+    let env = Arc::new(Environment::new(opts.completion_queue_count()));
     let service = geoip2_grpc::create_geo_ip(CityService::new(mmdb.clone()));
-    let mut server = ServerBuilder::new(env)
+    let builder = ServerBuilder::new(env)
         .register_service(service)
-        .bind(opts.host(), opts.port())
-        .build()
-        .unwrap();
+        .bind(opts.host(), opts.port());
+
+    let builder = if let Some(v) = opts.slots_per_cq {
+        builder.requests_slot_per_cq(v)
+    } else {
+        builder
+    };
+    let mut server = builder.build().unwrap();
     server.start();
 
     info!("started mmdb-grpc server listening on {}:{}", opts.host(), opts.port());
@@ -60,10 +72,17 @@ fn main() {
     loop {
         select! {
             recv(reload_event) -> _ => {
-                let r = mmdb::Reader::open_readfile(mmdb_path.clone()).unwrap();
-                let mut db = (*mmdb).write();
-                *db = r;
-                info!("mmdb reloads successfully");
+                match mmdb::Reader::open_readfile(mmdb_path.clone()) {
+                    Ok(reader) => {
+                        let mut db = (*mmdb).write();
+                        *db = reader;
+                        info!("succeeded to reload mmdb");
+                    }
+                    Err(err) => {
+                        error!("failed to reload mmdb, cause {:?}", err);
+                        break;
+                    }
+                }
             }
             recv(term_event) -> _ => {
                 info!("bye!");

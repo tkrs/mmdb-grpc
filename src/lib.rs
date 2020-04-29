@@ -32,12 +32,7 @@ impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
                     Some(format!("The request must be IP address but given '{}'", ip)),
                 )
             })
-            .and_then(|ip| {
-                (*self.0)
-                    .read()
-                    .lookup::<geoip2::City>(ip)
-                    .map_err(convert_error)
-            })
+            .and_then(|ip| (*self.0).read().lookup::<geoip2::City>(ip).map_err(convert_error))
             .map(|city| {
                 debug!("found city: {:?}", city);
 
@@ -105,8 +100,7 @@ impl From<WrappedCity> for CityReply {
         }
 
         if let Some(c) = geo_city.0.represented_country {
-            reply
-                .set_represented_country(RepresentedCountry::from(MRepresentedCountry(c, &filter)));
+            reply.set_represented_country(RepresentedCountry::from(MRepresentedCountry(c, &filter)));
         }
 
         if let Some(xs) = geo_city.0.subdivisions {
@@ -260,27 +254,16 @@ impl From<geoip2::model::Traits> for Traits {
 
 fn convert_error(err: MaxMindDBError) -> RpcStatus {
     match err {
-        MaxMindDBError::AddressNotFoundError(msg) => {
-            RpcStatus::new(RpcStatusCode::NOT_FOUND, msg.into())
-        }
-        MaxMindDBError::InvalidDatabaseError(msg) => {
-            RpcStatus::new(RpcStatusCode::INTERNAL, msg.into())
-        }
+        MaxMindDBError::AddressNotFoundError(msg) => RpcStatus::new(RpcStatusCode::NOT_FOUND, msg.into()),
+        MaxMindDBError::InvalidDatabaseError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
         MaxMindDBError::IoError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
         MaxMindDBError::MapError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
         MaxMindDBError::DecodingError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
     }
 }
 
-fn filter_locales<'a>(
-    names: BTreeMap<String, String>,
-    filter: &'a HashSet<String>,
-) -> HashMap<String, String> {
-    let cap = if filter.is_empty() {
-        names.len()
-    } else {
-        filter.len()
-    };
+fn filter_locales<'a>(names: BTreeMap<String, String>, filter: &'a HashSet<String>) -> HashMap<String, String> {
+    let cap = if filter.is_empty() { names.len() } else { filter.len() };
     let mut h: HashMap<String, String> = HashMap::with_capacity(cap);
     for (k, v) in names.into_iter() {
         if filter.is_empty() || filter.contains(&k) {
