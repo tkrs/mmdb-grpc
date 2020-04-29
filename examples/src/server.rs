@@ -1,38 +1,104 @@
-use futures::sync::oneshot;
+use clap::Clap;
+use crossbeam_channel::{bounded, select, Receiver};
 use futures::Future;
-use geoip_grpc::proto::geoip2_grpc;
-use geoip_grpc::CityService;
 use grpcio::{Environment, ServerBuilder};
 use maxminddb as mmdb;
-use std::io::Read;
+use mmdb_grpc::proto::geoip2_grpc;
+use mmdb_grpc::CityService;
+use signal_hook::{iterator::Signals, SIGHUP, SIGINT, SIGTERM};
+use spin::RwLock;
 use std::sync::Arc;
-use std::{io, thread};
+use std::thread;
 
-fn main() -> Result<(), String> {
+#[derive(Clap)]
+#[clap(version = "0.1", author = "Takeru Sato <type.in.type@gmail.com>")]
+struct Opts {
+    #[clap(short = "h", long = "host", default_value = "localhost")]
+    host: String,
+    #[clap(short = "p", long = "port", default_value = "50000")]
+    port: u16,
+    #[clap(short = "f", long = "file")]
+    mmdb_path: String,
+}
+
+impl Opts {
+    fn mmdb_path(&self) -> &String {
+        &self.mmdb_path
+    }
+    fn host(&self) -> &String {
+        &self.host
+    }
+    fn port(&self) -> u16 {
+        self.port
+    }
+}
+
+fn main() {
+    let opts: Opts = Opts::parse();
+
     let env = Arc::new(Environment::new(1));
-    let mut args = std::env::args().skip(1);
-    let reader = mmdb::Reader::open_readfile(
-        args.next()
-            .ok_or_else(|| "First argument must be the path to the IP database")?,
-    )
-    .unwrap();
-    let service = geoip2_grpc::create_geo_ip(CityService::new(reader));
+
+    let reader = mmdb::Reader::open_readfile(opts.mmdb_path()).unwrap();
+    let mmdb = Arc::new(RwLock::new(reader));
+
+    let service = geoip2_grpc::create_geo_ip(CityService::new(mmdb.clone()));
     let mut server = ServerBuilder::new(env)
         .register_service(service)
-        .bind("127.0.0.1", 50000)
+        .bind(opts.host(), opts.port())
         .build()
         .unwrap();
     server.start();
-    for (host, port) in server.bind_addrs() {
-        println!("listening on {}:{}", host, port);
+
+    println!(
+        "start mmdb-grpc server listening on {}:{}",
+        opts.host(),
+        opts.port()
+    );
+
+    let mmdb_path = opts.mmdb_path();
+    let term_event = terminate_channel().unwrap();
+    let reload_event = reload_channel().unwrap();
+    loop {
+        select! {
+            recv(reload_event) -> _ => {
+                let r = mmdb::Reader::open_readfile(mmdb_path.clone()).unwrap();
+                let mut db = (*mmdb).write();
+                *db = r;
+                println!("reloaded");
+            }
+            recv(term_event) -> _ => {
+                break;
+            }
+        }
     }
-    let (tx, rx) = oneshot::channel();
-    thread::spawn(move || {
-        println!("Press ENTER to exit...");
-        let _ = io::stdin().read(&mut [0]).unwrap();
-        tx.send(())
-    });
-    let _ = rx.wait();
+
     let _ = server.shutdown().wait();
-    Ok(())
+}
+
+fn terminate_channel() -> Result<Receiver<()>, String> {
+    let (sender, receiver) = bounded(1);
+
+    let signals = Signals::new(&[SIGTERM, SIGINT]).map_err(|err| err.to_string())?;
+
+    thread::spawn(move || {
+        for _ in signals.forever() {
+            let _ = sender.send(());
+        }
+    });
+
+    Ok(receiver)
+}
+
+fn reload_channel() -> Result<Receiver<()>, String> {
+    let (sender, receiver) = bounded(10);
+
+    let signals = Signals::new(&[SIGHUP]).map_err(|err| err.to_string())?;
+
+    thread::spawn(move || loop {
+        for _ in signals.forever() {
+            let _ = sender.send(());
+        }
+    });
+
+    Ok(receiver)
 }

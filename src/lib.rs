@@ -5,22 +5,23 @@ use crate::proto::geoip2_grpc::*;
 use futures::Future;
 use grpcio::{RpcContext, RpcStatus, RpcStatusCode, UnarySink};
 use maxminddb::{self, geoip2, MaxMindDBError};
+use spin::RwLock;
 use std::collections::HashMap;
 use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct CityService<T: AsRef<[u8]>>(Arc<maxminddb::Reader<T>>);
+pub struct CityService<T: AsRef<[u8]>>(Arc<RwLock<maxminddb::Reader<T>>>);
 
 impl<T: AsRef<[u8]>> CityService<T> {
-    pub fn new(db: maxminddb::Reader<T>) -> CityService<T> {
-        CityService(Arc::new(db))
+    pub fn new(db: Arc<RwLock<maxminddb::Reader<T>>>) -> CityService<T> {
+        CityService(db)
     }
 }
 
 impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
     fn lookup(&mut self, ctx: RpcContext, req: Ip, sink: UnarySink<CityReply>) {
         if let Some(ip) = req.ip.parse().ok() {
-            match (*self.0).lookup::<geoip2::City>(ip) {
+            match (*self.0).read().lookup::<geoip2::City>(ip) {
                 Ok(a) => {
                     let reply = CityReply::from(a);
                     let f = sink
@@ -32,7 +33,7 @@ impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
                     let status = convert_error(err);
                     let f = sink
                         .fail(status)
-                        .map_err(move |e| println!("failed to reply {:?}: {:?}", req, e));
+                        .map_err(move |e| eprintln!("failed to reply {:?}: {:?}", req, e));
                     ctx.spawn(f)
                 }
             }
@@ -45,7 +46,7 @@ impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
                         req.ip
                     )),
                 ))
-                .map_err(move |e| println!("failed to reply {:?}: {:?}", req, e));
+                .map_err(move |e| eprintln!("failed to reply {:?}: {:?}", req, e));
             ctx.spawn(f)
         }
     }
