@@ -80,7 +80,7 @@ fn main() {
 }
 
 fn terminate_channel() -> Result<Receiver<()>, String> {
-    let (sender, receiver) = bounded(1);
+    let (sender, receiver) = bounded(0);
 
     let signals = Signals::new(&[SIGTERM, SIGINT]).map_err(|err| err.to_string())?;
 
@@ -94,7 +94,7 @@ fn terminate_channel() -> Result<Receiver<()>, String> {
 }
 
 fn reload_channel() -> Result<Receiver<()>, String> {
-    let (sender, receiver) = bounded(10);
+    let (sender, receiver) = bounded(0);
 
     let signals = Signals::new(&[SIGHUP]).map_err(|err| err.to_string())?;
 
