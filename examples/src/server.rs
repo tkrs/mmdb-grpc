@@ -52,11 +52,7 @@ fn main() {
         .unwrap();
     server.start();
 
-    info!(
-        "started mmdb-grpc server listening on {}:{}",
-        opts.host(),
-        opts.port(),
-    );
+    info!("started mmdb-grpc server listening on {}:{}", opts.host(), opts.port());
 
     let mmdb_path = opts.mmdb_path();
     let term_event = terminate_channel().unwrap();
