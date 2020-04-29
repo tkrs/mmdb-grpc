@@ -3,10 +3,23 @@ syntax = "proto3";
 package geoip2;
 
 service GeoIp {
-  rpc Lookup(Ip) returns (CityReply) {}
+  rpc Lookup(Message) returns (CityReply) {}
 }
 
-message Ip { string ip = 1; }
+message Message {
+  string ip = 1;
+  enum Locale {
+    BRAZLIAN_PORTUGUESE = 0;
+    ENGLISH = 1;
+    FRENCH = 2;
+    GERMAN = 3;
+    JAPANESE = 4;
+    RUSSIAN = 5;
+    SIMPLIFIED_CHINESE = 6;
+    SPANISH = 7;
+  }
+  repeated Locale locales = 2;
+}
 
 message CityReply {
   oneof city_option { City city = 1; }
@@ -14,11 +27,12 @@ message CityReply {
   oneof country_option { Country country = 3; }
   oneof location_option { Location location = 4; }
   oneof postal_option { Postal postal = 5; }
+  oneof registered_country_option { Country registered_country = 6; }
   oneof represented_country_option {
-    RepresentedCountry represented_country = 6;
+    RepresentedCountry represented_country = 7;
   }
-  repeated Subdivision subdivisions = 7;
-  oneof traits_option { Traits traits = 8; }
+  repeated Subdivision subdivisions = 8;
+  oneof traits_option { Traits traits = 9; }
 }
 
 message City {
@@ -34,7 +48,7 @@ message Continent {
 
 message Country {
   oneof geoname_id_option { uint32 geoname_id = 1; }
-  oneof is_in_european_union_option { bool is_in_european_union = 2; }
+  oneof in_european_union_option { bool in_european_union = 2; }
   oneof iso_code_option { string iso_code = 3; }
   map<string, string> names = 4;
 }
@@ -63,6 +77,6 @@ message Subdivision {
 }
 
 message Traits {
-  oneof is_anonymous_proxy_option { bool is_anonymous_proxy = 1; }
-  oneof is_satellite_provider_option { bool is_satellite_provider = 2; }
+  oneof anonymous_proxy_option { bool anonymous_proxy = 1; }
+  oneof satellite_provider_option { bool satellite_provider = 2; }
 }

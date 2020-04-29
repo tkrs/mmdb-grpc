@@ -67,6 +67,7 @@ fn main() {
                 println!("reloaded");
             }
             recv(term_event) -> _ => {
+                println!("bye!");
                 break;
             }
         }

@@ -6,7 +6,7 @@ use futures::Future;
 use grpcio::{RpcContext, RpcStatus, RpcStatusCode, UnarySink};
 use maxminddb::{self, geoip2, MaxMindDBError};
 use spin::RwLock;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -19,11 +19,15 @@ impl<T: AsRef<[u8]>> CityService<T> {
 }
 
 impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
-    fn lookup(&mut self, ctx: RpcContext, req: Ip, sink: UnarySink<CityReply>) {
+    fn lookup(&mut self, ctx: RpcContext, req: Message, sink: UnarySink<CityReply>) {
         if let Some(ip) = req.ip.parse().ok() {
             match (*self.0).read().lookup::<geoip2::City>(ip) {
                 Ok(a) => {
-                    let reply = CityReply::from(a);
+                    let mut ns = HashSet::with_capacity(req.locales.len());
+                    for n in req.locales {
+                        ns.insert(n.to_string());
+                    }
+                    let reply = CityReply::from(WrappedCity(a, ns));
                     let f = sink
                         .success(reply.clone())
                         .map_err(move |err| eprintln!("failed to reply: {:?}", err));
@@ -51,61 +55,122 @@ impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
         }
     }
 }
-impl From<geoip2::model::City> for City {
-    fn from(c: geoip2::model::City) -> City {
+
+impl ToString for Message_Locale {
+    fn to_string(&self) -> String {
+        match self {
+            Message_Locale::BRAZLIAN_PORTUGUESE => "pt-BR".into(),
+            Message_Locale::ENGLISH => "en".into(),
+            Message_Locale::FRENCH => "fr".into(),
+            Message_Locale::GERMAN => "de".into(),
+            Message_Locale::JAPANESE => "ja".into(),
+            Message_Locale::RUSSIAN => "ru".into(),
+            Message_Locale::SIMPLIFIED_CHINESE => "zh-CN".into(),
+            Message_Locale::SPANISH => "es".into(),
+        }
+    }
+}
+
+struct WrappedCity(geoip2::City, HashSet<String>);
+
+impl From<WrappedCity> for CityReply {
+    fn from(geo_city: WrappedCity) -> CityReply {
+        let mut reply = CityReply::default();
+
+        let filter = geo_city.1;
+
+        if let Some(c) = geo_city.0.city {
+            reply.set_city(City::from(MCity(c, &filter)));
+        }
+
+        if let Some(c) = geo_city.0.continent {
+            reply.set_continent(Continent::from(MContinent(c, &filter)));
+        }
+
+        if let Some(c) = geo_city.0.country {
+            reply.set_country(Country::from(MCountry(c, &filter)));
+        }
+
+        if let Some(c) = geo_city.0.location {
+            reply.set_location(Location::from(c));
+        }
+
+        if let Some(c) = geo_city.0.postal {
+            reply.set_postal(Postal::from(c));
+        }
+
+        if let Some(c) = geo_city.0.registered_country {
+            reply.set_registered_country(Country::from(MCountry(c, &filter)));
+        }
+
+        if let Some(c) = geo_city.0.represented_country {
+            reply
+                .set_represented_country(RepresentedCountry::from(MRepresentedCountry(c, &filter)));
+        }
+
+        if let Some(xs) = geo_city.0.subdivisions {
+            let subs = Subdivisions::from(xs);
+            let vs = ::protobuf::RepeatedField::from_vec(subs.0);
+            reply.set_subdivisions(vs);
+        }
+
+        if let Some(c) = geo_city.0.traits {
+            reply.set_traits(Traits::from(c));
+        }
+
+        reply
+    }
+}
+
+struct MCity<'a>(geoip2::model::City, &'a HashSet<String>);
+
+impl<'a> From<MCity<'a>> for City {
+    fn from(c: MCity) -> City {
         let mut r = City::default();
-        if let Some(a) = c.geoname_id {
+        if let Some(a) = c.0.geoname_id {
             r.set_geoname_id(a);
         }
-        if let Some(n) = c.names {
-            let mut h: HashMap<String, String> = HashMap::with_capacity(n.len());
-            for (k, v) in n.into_iter() {
-                h.insert(k, v);
-            }
-            r.set_names(h);
+        if let Some(n) = c.0.names {
+            r.set_names(filter_locales(n, c.1));
         }
         r
     }
 }
 
-impl From<geoip2::model::Continent> for Continent {
-    fn from(c: geoip2::model::Continent) -> Continent {
+struct MContinent<'a>(geoip2::model::Continent, &'a HashSet<String>);
+
+impl<'a> From<MContinent<'a>> for Continent {
+    fn from(c: MContinent) -> Continent {
         let mut r = Continent::default();
-        if let Some(a) = c.code {
+        if let Some(a) = c.0.code {
             r.set_code(a)
         }
-        if let Some(a) = c.geoname_id {
+        if let Some(a) = c.0.geoname_id {
             r.set_geoname_id(a)
         }
-        if let Some(n) = c.names {
-            let mut h: HashMap<String, String> = HashMap::with_capacity(n.len());
-            for (k, v) in n.into_iter() {
-                h.insert(k, v);
-            }
-            r.set_names(h);
+        if let Some(n) = c.0.names {
+            r.set_names(filter_locales(n, c.1));
         }
         r
     }
 }
 
-impl From<geoip2::model::Country> for Country {
-    fn from(c: geoip2::model::Country) -> Country {
+struct MCountry<'a>(geoip2::model::Country, &'a HashSet<String>);
+
+impl<'a> From<MCountry<'a>> for Country {
+    fn from(c: MCountry) -> Country {
         let mut r = Country::default();
-        if let Some(a) = c.geoname_id {
+        if let Some(a) = c.0.geoname_id {
             r.set_geoname_id(a);
         }
-        if let Some(a) = c.is_in_european_union {
-            r.set_is_in_european_union(a);
+        if let Some(a) = c.0.is_in_european_union {
+            r.set_in_european_union(a);
         }
-        if let Some(a) = c.iso_code {
+        if let Some(a) = c.0.iso_code {
             r.set_iso_code(a);
         }
-        if let Some(n) = c.names {
-            let mut h: HashMap<String, String> = HashMap::with_capacity(n.len());
-            for (k, v) in n.into_iter() {
-                h.insert(k, v);
-            }
-            r.set_names(h);
+        if let Some(n) = c.0.names {
+            r.set_names(filter_locales(n, c.1));
         }
         r
     }
@@ -140,21 +205,19 @@ impl From<geoip2::model::Postal> for Postal {
     }
 }
 
-impl From<geoip2::model::RepresentedCountry> for RepresentedCountry {
-    fn from(c: geoip2::model::RepresentedCountry) -> RepresentedCountry {
+struct MRepresentedCountry<'a>(geoip2::model::RepresentedCountry, &'a HashSet<String>);
+
+impl<'a> From<MRepresentedCountry<'a>> for RepresentedCountry {
+    fn from(c: MRepresentedCountry) -> RepresentedCountry {
         let mut r = RepresentedCountry::default();
-        if let Some(a) = c.geoname_id {
+        if let Some(a) = c.0.geoname_id {
             r.set_geoname_id(a);
         }
-        if let Some(a) = c.iso_code {
+        if let Some(a) = c.0.iso_code {
             r.set_iso_code(a);
         }
-        if let Some(n) = c.names {
-            let mut h: HashMap<String, String> = HashMap::with_capacity(n.len());
-            for (k, v) in n.into_iter() {
-                h.insert(k, v);
-            }
-            r.set_names(h);
+        if let Some(n) = c.0.names {
+            r.set_names(filter_locales(n, c.1));
         }
         r
     }
@@ -181,24 +244,16 @@ impl From<Vec<geoip2::model::Subdivision>> for Subdivisions {
     }
 }
 
-impl From<geoip2::City> for CityReply {
-    fn from(geo_city: geoip2::City) -> CityReply {
-        let mut reply = CityReply::default();
-        if let Some(c) = geo_city.city {
-            reply.set_city(City::from(c));
+impl From<geoip2::model::Traits> for Traits {
+    fn from(c: geoip2::model::Traits) -> Traits {
+        let mut t = Traits::default();
+        if let Some(v) = c.is_anonymous_proxy {
+            t.set_anonymous_proxy(v);
         }
-
-        if let Some(c) = geo_city.country {
-            reply.set_country(Country::from(c));
+        if let Some(v) = c.is_satellite_provider {
+            t.set_satellite_provider(v);
         }
-
-        if let Some(xs) = geo_city.subdivisions {
-            let subs = Subdivisions::from(xs);
-            let vs = ::protobuf::RepeatedField::from_vec(subs.0);
-            reply.set_subdivisions(vs);
-        }
-
-        reply
+        t
     }
 }
 
@@ -214,4 +269,24 @@ fn convert_error(err: MaxMindDBError) -> RpcStatus {
         MaxMindDBError::MapError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
         MaxMindDBError::DecodingError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
     }
+}
+
+fn filter_locales<'a>(
+    names: BTreeMap<String, String>,
+    filter: &'a HashSet<String>,
+) -> HashMap<String, String> {
+    let cap = if filter.is_empty() {
+        names.len()
+    } else {
+        filter.len()
+    };
+    let mut h: HashMap<String, String> = HashMap::with_capacity(cap);
+    for (k, v) in names.into_iter() {
+        if filter.contains(&k) {
+            h.insert(k, v);
+        } else if filter.is_empty() {
+            h.insert(k, v);
+        }
+    }
+    h
 }

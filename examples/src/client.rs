@@ -34,17 +34,26 @@ fn main() {
     let ch = ChannelBuilder::new(env).connect(format!("{}:{}", opts.host(), opts.port()).as_ref());
     let client = GeoIpClient::new(ch);
 
-    let mut ip = Ip::default();
-    ip.set_ip(opts.ip().clone());
+    let mut msg = Message::default();
+    msg.set_ip(opts.ip().clone());
 
-    match client.lookup(&ip) {
+    match client.lookup(&msg) {
         Ok(entity) => {
-            println!("requested IP: {:?}, got city: {:?}", ip.ip, entity);
+            println!("requested message: {:?}, got city: {:?}", msg, entity);
         }
         Err(err) => {
             println!("failed RPC, cause: {}", err);
         }
     }
 
-    std::thread::sleep(std::time::Duration::from_secs(1));
+    msg.set_locales(vec![Message_Locale::ENGLISH, Message_Locale::JAPANESE]);
+
+    match client.lookup(&msg) {
+        Ok(entity) => {
+            println!("requested message: {:?}, got city: {:?}", msg, entity);
+        }
+        Err(err) => {
+            println!("failed RPC, cause: {}", err);
+        }
+    }
 }
