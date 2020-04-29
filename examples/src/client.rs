@@ -1,5 +1,7 @@
 use clap::Clap;
+use env_logger;
 use grpcio::{ChannelBuilder, EnvBuilder};
+use log::{error, info};
 use mmdb_grpc::proto::geoip2::*;
 use mmdb_grpc::proto::geoip2_grpc::GeoIpClient;
 use std::sync::Arc;
@@ -28,6 +30,8 @@ impl Opts {
 }
 
 fn main() {
+    let _ = env_logger::init();
+
     let opts: Opts = Opts::parse();
 
     let env = Arc::new(EnvBuilder::new().build());
@@ -39,10 +43,10 @@ fn main() {
 
     match client.lookup(&msg) {
         Ok(entity) => {
-            println!("requested message: {:?}, got city: {:?}", msg, entity);
+            info!("requested message: {:?}, got city: {:?}", msg, entity);
         }
         Err(err) => {
-            println!("failed RPC, cause: {}", err);
+            error!("failed RPC, cause: {}", err);
         }
     }
 
@@ -50,10 +54,10 @@ fn main() {
 
     match client.lookup(&msg) {
         Ok(entity) => {
-            println!("requested message: {:?}, got city: {:?}", msg, entity);
+            info!("requested message: {:?}, got city: {:?}", msg, entity);
         }
         Err(err) => {
-            println!("failed RPC, cause: {}", err);
+            error!("failed RPC, cause: {}", err);
         }
     }
 }

@@ -4,6 +4,7 @@ use crate::proto::geoip2::*;
 use crate::proto::geoip2_grpc::*;
 use futures::Future;
 use grpcio::{RpcContext, RpcStatus, RpcStatusCode, UnarySink};
+use log::{debug, error};
 use maxminddb::{self, geoip2, MaxMindDBError};
 use spin::RwLock;
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -20,6 +21,8 @@ impl<T: AsRef<[u8]>> CityService<T> {
 
 impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
     fn lookup(&mut self, ctx: RpcContext, req: Message, sink: UnarySink<CityReply>) {
+        debug!("received the message: {:?}", req);
+
         let Message { ip, locales, .. } = req;
         let result = ip
             .parse()
@@ -33,9 +36,11 @@ impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
                 (*self.0)
                     .read()
                     .lookup::<geoip2::City>(ip)
-                    .map_err(|err| convert_error(err))
+                    .map_err(convert_error)
             })
             .map(|city| {
+                debug!("found city: {:?}", city);
+
                 let mut ns = HashSet::with_capacity(locales.len());
                 for n in locales {
                     ns.insert(n.to_string());
@@ -48,7 +53,7 @@ impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
             Err(status) => sink.fail(status),
         };
 
-        ctx.spawn(f.map_err(move |err| eprintln!("failed to reply, cause: {:?}", err)))
+        ctx.spawn(f.map_err(move |err| error!("failed to reply, cause: {:?}", err)))
     }
 }
 

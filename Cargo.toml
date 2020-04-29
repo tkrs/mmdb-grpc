@@ -8,13 +8,15 @@ edition = "2018"
 futures = "0.1"
 grpcio = "0.5"
 protobuf = "2.14"
-spin = "0.5.2"
+spin = "0.5"
 maxminddb = "0.13"
+log = "0.4"
 
 [dev-dependencies]
 crossbeam-channel = "0.4"
 signal-hook = "0.1"
 clap = { git = "https://github.com/clap-rs/clap/" } # v3
+env_logger = "0.7"
 
 [build-dependencies]
 protoc-grpcio = "1.2"

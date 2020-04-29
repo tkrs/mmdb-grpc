@@ -1,7 +1,9 @@
 use clap::Clap;
 use crossbeam_channel::{bounded, select, Receiver};
+use env_logger;
 use futures::Future;
 use grpcio::{Environment, ServerBuilder};
+use log::info;
 use maxminddb as mmdb;
 use mmdb_grpc::proto::geoip2_grpc;
 use mmdb_grpc::CityService;
@@ -34,13 +36,14 @@ impl Opts {
 }
 
 fn main() {
-    let opts: Opts = Opts::parse();
+    let _ = env_logger::init();
 
-    let env = Arc::new(Environment::new(1));
+    let opts: Opts = Opts::parse();
 
     let reader = mmdb::Reader::open_readfile(opts.mmdb_path()).unwrap();
     let mmdb = Arc::new(RwLock::new(reader));
 
+    let env = Arc::new(Environment::new(1));
     let service = geoip2_grpc::create_geo_ip(CityService::new(mmdb.clone()));
     let mut server = ServerBuilder::new(env)
         .register_service(service)
@@ -49,10 +52,10 @@ fn main() {
         .unwrap();
     server.start();
 
-    println!(
+    info!(
         "started mmdb-grpc server listening on {}:{}",
         opts.host(),
-        opts.port()
+        opts.port(),
     );
 
     let mmdb_path = opts.mmdb_path();
@@ -64,10 +67,10 @@ fn main() {
                 let r = mmdb::Reader::open_readfile(mmdb_path.clone()).unwrap();
                 let mut db = (*mmdb).write();
                 *db = r;
-                println!("reloaded");
+                info!("mmdb reloads successfully");
             }
             recv(term_event) -> _ => {
-                println!("bye!");
+                info!("bye!");
                 break;
             }
         }
