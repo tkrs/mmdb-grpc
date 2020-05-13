@@ -5,25 +5,23 @@ authors = ["Takeru Sato <type.in.type@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+clap = { git = "https://github.com/clap-rs/clap/" } # v3
+crossbeam-channel = "0.4"
+env_logger = "0.7"
 futures = "0.1"
 grpcio = "0.5"
-protobuf = "2.14"
-spin = "0.5"
-maxminddb = "0.13"
 log = "0.4"
-
-[dev-dependencies]
-crossbeam-channel = "0.4"
+maxminddb = "0.13"
+protobuf = "2.14"
 signal-hook = "0.1"
-clap = { git = "https://github.com/clap-rs/clap/" } # v3
-env_logger = "0.7"
+spin = "0.5"
 
 [build-dependencies]
 protoc-grpcio = "1.2"
 
-[[example]]
+[[bin]]
 name = "mmdb-server"
-path = "examples/src/server.rs"
+path = "src/server.rs"
 
 [[example]]
 name = "mmdb-client"
