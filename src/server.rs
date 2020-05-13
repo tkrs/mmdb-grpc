@@ -80,7 +80,6 @@ fn main() {
                     }
                     Err(err) => {
                         error!("failed to reload mmdb, cause {:?}", err);
-                        break;
                     }
                 }
             }
