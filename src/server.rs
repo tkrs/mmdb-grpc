@@ -2,7 +2,7 @@ use clap::Clap;
 use crossbeam_channel::{bounded, select, Receiver};
 use env_logger;
 use futures::Future;
-use grpcio::{Environment, ServerBuilder};
+use grpcio::{ChannelBuilder, Environment, ServerBuilder};
 use log::{error, info};
 use maxminddb as mmdb;
 use mmdb_grpc::proto::geoip2_grpc;
@@ -11,6 +11,7 @@ use signal_hook::{iterator::Signals, SIGHUP, SIGINT, SIGTERM};
 use spin::RwLock;
 use std::sync::Arc;
 use std::thread;
+use std::time::Duration;
 
 #[derive(Clap)]
 #[clap(version = "0.1", author = "Takeru Sato <type.in.type@gmail.com>")]
@@ -21,8 +22,8 @@ struct Opts {
     port: u16,
     #[clap(short = "f", long = "file")]
     mmdb_path: String,
-    #[clap(long = "completion-queue-count", default_value = "1")]
-    completion_queue_count: usize,
+    #[clap(long = "workers", default_value = "1")]
+    workers: usize,
     #[clap(long = "slots-per-cq")]
     slots_per_cq: Option<usize>,
 }
@@ -37,8 +38,8 @@ impl Opts {
     fn port(&self) -> u16 {
         self.port
     }
-    fn completion_queue_count(&self) -> usize {
-        self.completion_queue_count
+    fn workers(&self) -> usize {
+        self.workers
     }
 }
 
@@ -50,17 +51,26 @@ fn main() {
     let reader = mmdb::Reader::open_readfile(opts.mmdb_path()).unwrap();
     let mmdb = Arc::new(RwLock::new(reader));
 
-    let env = Arc::new(Environment::new(opts.completion_queue_count()));
+    let env = Arc::new(Environment::new(opts.workers()));
     let service = geoip2_grpc::create_geo_ip(CityService::new(mmdb.clone()));
-    let builder = ServerBuilder::new(env)
+    let mut builder = ServerBuilder::new(env.clone())
         .register_service(service)
         .bind(opts.host(), opts.port());
 
-    let builder = if let Some(v) = opts.slots_per_cq {
-        builder.requests_slot_per_cq(v)
-    } else {
-        builder
-    };
+    let args = ChannelBuilder::new(env)
+        .keepalive_time(Duration::from_secs(10))
+        .keepalive_timeout(Duration::from_secs(5))
+        .keepalive_permit_without_calls(true)
+        .http2_max_pings_without_data(0)
+        .http2_min_recv_ping_interval_without_data(Duration::from_secs(5))
+        .build_args();
+
+    builder = builder.channel_args(args);
+
+    if let Some(v) = opts.slots_per_cq {
+        builder = builder.requests_slot_per_cq(v);
+    }
+
     let mut server = builder.build().unwrap();
     server.start();
 
