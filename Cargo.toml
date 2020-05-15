@@ -5,7 +5,7 @@ authors = ["Takeru Sato <type.in.type@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-clap = { git = "https://github.com/clap-rs/clap/" } # v3
+clap = "3.0.0-beta.1"
 crossbeam-channel = "0.4"
 env_logger = "0.7"
 futures = "0.1"
