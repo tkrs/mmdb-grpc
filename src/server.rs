@@ -3,10 +3,11 @@ use crossbeam_channel::{bounded, select, Receiver};
 use env_logger;
 use futures::Future;
 use grpcio::{ChannelBuilder, Environment, ServerBuilder};
+use grpcio_proto::health::v1::health::*;
 use log::{error, info};
 use maxminddb as mmdb;
 use mmdb_grpc::proto::geoip2_grpc;
-use mmdb_grpc::CityService;
+use mmdb_grpc::{CityService, HealthService};
 use signal_hook::{iterator::Signals, SIGHUP, SIGINT, SIGTERM};
 use spin::RwLock;
 use std::sync::Arc;
@@ -51,9 +52,11 @@ fn main() {
     let mmdb = Arc::new(RwLock::new(reader));
 
     let env = Arc::new(Environment::new(opts.workers()));
-    let service = geoip2_grpc::create_geo_ip(CityService::new(mmdb.clone()));
+    let geoip_service = geoip2_grpc::create_geo_ip(CityService::new(mmdb.clone()));
+    let health_service = create_health(HealthService);
     let mut builder = ServerBuilder::new(env.clone())
-        .register_service(service)
+        .register_service(geoip_service)
+        .register_service(health_service)
         .bind(opts.host(), opts.port());
 
     let args = ChannelBuilder::new(env)

@@ -10,6 +10,7 @@ crossbeam-channel = "0.4"
 env_logger = "0.7"
 futures = "0.1"
 grpcio = "0.5"
+grpcio-proto = "0.5"
 log = "0.4"
 maxminddb = "0.13"
 protobuf = "2.14"
@@ -22,6 +23,10 @@ protoc-grpcio = "1.2"
 [[bin]]
 name = "mmdb-server"
 path = "src/server.rs"
+
+[profile.release]
+debug = true
+lto = true
 
 [[example]]
 name = "mmdb-client"

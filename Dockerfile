@@ -30,6 +30,9 @@ RUN cargo build --release --bin mmdb-server
 
 FROM debian:buster-slim
 
+ENV RUST_LOG=info
+ENV RUST_BACKTRACE=1
+
 COPY --from=stage /tmp/workspace/project/target/release/mmdb-server /usr/local/bin/
 
 ENTRYPOINT  [ "/usr/local/bin/mmdb-server" ]

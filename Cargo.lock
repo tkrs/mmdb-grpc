@@ -260,6 +260,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "grpcio-proto"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e67e153c5e26fe336365f14e5124630131b09b96ac27a78594824e241da54f0"
+dependencies = [
+ "futures",
+ "grpcio",
+ "grpcio-compiler",
+ "protobuf",
+ "protobuf-build",
+ "walkdir",
+]
+
+[[package]]
 name = "grpcio-sys"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -385,6 +399,7 @@ dependencies = [
  "env_logger",
  "futures",
  "grpcio",
+ "grpcio-proto",
  "log",
  "maxminddb",
  "protobuf",
@@ -473,6 +488,19 @@ name = "protobuf"
 version = "2.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8e86d370532557ae7573551a1ec8235a0f8d6cb276c7c9e6aa490b511c447485"
+
+[[package]]
+name = "protobuf-build"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46f3ca050cd02aa2ee07f8e227871ebe8c12cf076ff7c6bf82fdd41dc81af874"
+dependencies = [
+ "bitflags",
+ "grpcio-compiler",
+ "protobuf",
+ "protobuf-codegen",
+ "regex",
+]
 
 [[package]]
 name = "protobuf-codegen"

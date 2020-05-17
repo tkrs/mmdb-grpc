@@ -4,6 +4,7 @@ use crate::proto::geoip2::*;
 use crate::proto::geoip2_grpc::*;
 use futures::Future;
 use grpcio::{RpcContext, RpcStatus, RpcStatusCode, UnarySink};
+use grpcio_proto::health::v1::health::*;
 use log::{debug, error};
 use maxminddb::{self, geoip2, MaxMindDBError};
 use spin::RwLock;
@@ -271,4 +272,20 @@ fn filter_locales<'a>(names: BTreeMap<String, String>, filter: &'a HashSet<Strin
         }
     }
     h
+}
+
+#[derive(Clone)]
+pub struct HealthService;
+
+impl Health for HealthService {
+    fn check(&mut self, ctx: RpcContext<'_>, req: HealthCheckRequest, sink: UnarySink<HealthCheckResponse>) {
+        debug!("check the service: {}", req.get_service());
+        let mut resp = HealthCheckResponse::default();
+        resp.set_status(HealthCheckResponse_ServingStatus::SERVING);
+        ctx.spawn(
+            sink.success(resp)
+                .map_err(|e| error!("failed to report result: {:?}", e))
+                .map(|_| ()),
+        );
+    }
 }
