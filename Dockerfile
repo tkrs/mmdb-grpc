@@ -11,6 +11,8 @@ RUN curl -OL https://github.com/google/protobuf/releases/download/v3.11.4/protoc
   mv protoc3/include/* /usr/local/include/ && \
   protoc --version
 
+RUN rustup component add clippy
+
 RUN mkdir -p /tmp/workspace/project/src
 WORKDIR /tmp/workspace/project
 
@@ -22,7 +24,8 @@ RUN mkdir src/proto
 RUN echo "fn main() {}" > src/server.rs
 # RUN echo "use protoc_grpcio\nfn main() {}" > build.rs
 
-RUN cargo build --release
+RUN cargo clippy --release --bin mmdb-server -- -D warnings
+RUN cargo build --release --bin mmdb-server
 
 COPY . .
 

@@ -1,5 +1,4 @@
 use clap::Clap;
-use env_logger;
 use grpcio::{ChannelBuilder, EnvBuilder};
 use log::{error, info};
 use mmdb_grpc::proto::geoip2::*;
@@ -30,7 +29,7 @@ impl Opts {
 }
 
 fn main() {
-    let _ = env_logger::init();
+    env_logger::init();
 
     let opts: Opts = Opts::parse();
 

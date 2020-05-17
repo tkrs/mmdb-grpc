@@ -1,6 +1,5 @@
 use clap::Clap;
 use crossbeam_channel::{bounded, select, Receiver};
-use env_logger;
 use futures::Future;
 use grpcio::{ChannelBuilder, Environment, ServerBuilder};
 use grpcio_proto::health::v1::health::*;
@@ -44,7 +43,7 @@ impl Opts {
 }
 
 fn main() {
-    let _ = env_logger::init();
+    env_logger::init();
 
     let opts: Opts = Opts::parse();
 
