@@ -11,7 +11,6 @@ use signal_hook::{iterator::Signals, SIGHUP, SIGINT, SIGTERM};
 use spin::RwLock;
 use std::sync::Arc;
 use std::thread;
-use std::time::Duration;
 
 #[derive(Clap)]
 #[clap(version = "0.1", author = "Takeru Sato <type.in.type@gmail.com>")]
@@ -58,11 +57,11 @@ fn main() {
         .bind(opts.host(), opts.port());
 
     let args = ChannelBuilder::new(env)
-        .keepalive_time(Duration::from_secs(10))
-        .keepalive_timeout(Duration::from_secs(5))
-        .keepalive_permit_without_calls(true)
-        .http2_max_pings_without_data(0)
-        .http2_min_recv_ping_interval_without_data(Duration::from_secs(5))
+        // .keepalive_time(Duration::from_secs(10))
+        // .keepalive_timeout(Duration::from_secs(5))
+        // .keepalive_permit_without_calls(true)
+        // .http2_max_pings_without_data(0)
+        // .http2_min_recv_ping_interval_without_data(Duration::from_secs(5))
         .build_args();
 
     builder = builder.channel_args(args);
