@@ -51,7 +51,10 @@ fn main() {
     let mmdb = Arc::new(RwLock::new(reader));
 
     let env = Arc::new(Environment::new(opts.workers()));
-    let geoip_service = geoip2_grpc::create_geo_ip(CityService::new(mmdb.clone()));
+    let cloned_path = opts.mmdb_path().clone();
+    let geoip_service = geoip2_grpc::create_geo_ip(CityService::new(mmdb.clone(), move || {
+        mmdb::Reader::open_readfile(cloned_path.clone())
+    }));
     let health_service = create_health(HealthService);
     let mut builder = ServerBuilder::new(env.clone())
         .register_service(geoip_service)

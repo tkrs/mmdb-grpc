@@ -59,4 +59,14 @@ fn main() {
             error!("failed RPC, cause: {}", err);
         }
     }
+
+    match client.reload(&Empty::new()) {
+        Ok(r) => info!("succeeded to reload: {:?}", r),
+        Err(err) => error!("failed RPC, cause: {}", err),
+    }
+
+    match client.metadata(&Empty::new()) {
+        Ok(r) => info!("succeeded to request metadata: {:?}", r),
+        Err(err) => error!("failed RPC, cause: {}", err),
+    }
 }

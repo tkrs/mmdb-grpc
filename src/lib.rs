@@ -6,21 +6,32 @@ use futures::Future;
 use grpcio::{RpcContext, RpcStatus, RpcStatusCode, UnarySink};
 use grpcio_proto::health::v1::health::*;
 use log::{debug, error};
-use maxminddb::{self, geoip2, MaxMindDBError};
+use maxminddb::{self, geoip2, MaxMindDBError, Metadata};
 use spin::RwLock;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct CityService<T: AsRef<[u8]>>(Arc<RwLock<maxminddb::Reader<T>>>);
+pub struct CityService<T, R>(Arc<RwLock<maxminddb::Reader<T>>>, R)
+where
+    T: AsRef<[u8]>,
+    R: Fn() -> Result<maxminddb::Reader<T>, MaxMindDBError>;
 
-impl<T: AsRef<[u8]>> CityService<T> {
-    pub fn new(db: Arc<RwLock<maxminddb::Reader<T>>>) -> CityService<T> {
-        CityService(db)
+impl<T, R> CityService<T, R>
+where
+    T: AsRef<[u8]>,
+    R: Fn() -> Result<maxminddb::Reader<T>, MaxMindDBError>,
+{
+    pub fn new(db: Arc<RwLock<maxminddb::Reader<T>>>, reloader: R) -> CityService<T, R> {
+        CityService(db, reloader)
     }
 }
 
-impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
+impl<T, R> GeoIp for CityService<T, R>
+where
+    T: AsRef<[u8]>,
+    R: Fn() -> Result<maxminddb::Reader<T>, MaxMindDBError>,
+{
     fn lookup(&mut self, ctx: RpcContext, req: Message, sink: UnarySink<CityReply>) {
         debug!("received the message: {:?}", req);
 
@@ -43,6 +54,27 @@ impl<T: AsRef<[u8]>> GeoIp for CityService<T> {
                 }
                 CityReply::from(WrappedCity(city, ns))
             });
+
+        let f = match result {
+            Ok(reply) => sink.success(reply),
+            Err(status) => sink.fail(status),
+        };
+
+        ctx.spawn(f.map_err(move |err| error!("failed to reply, cause: {:?}", err)))
+    }
+    fn metadata(&mut self, ctx: RpcContext, _req: Empty, sink: UnarySink<MetadataReply>) {
+        let result = MetadataReply::from(&self.0.read().metadata);
+        let f = sink.success(result);
+        ctx.spawn(f.map_err(move |err| error!("failed to reply, cause: {:?}", err)))
+    }
+    fn reload(&mut self, ctx: RpcContext, _req: Empty, sink: UnarySink<MetadataReply>) {
+        let result = self.1()
+            .map(|reader| {
+                let mut guard = self.0.write();
+                *guard = reader;
+                MetadataReply::from(&guard.metadata)
+            })
+            .map_err(|e| convert_error(e));
 
         let f = match result {
             Ok(reply) => sink.success(reply),
@@ -272,6 +304,30 @@ fn filter_locales<'a>(names: BTreeMap<String, String>, filter: &'a HashSet<Strin
         }
     }
     h
+}
+
+impl From<&Metadata> for MetadataReply {
+    fn from(v: &Metadata) -> MetadataReply {
+        let mut r = MetadataReply::default();
+        r.set_binary_format_major_version(v.binary_format_major_version as u32);
+        r.set_binary_format_minor_version(v.binary_format_minor_version as u32);
+        r.set_build_epoch(v.build_epoch);
+        r.set_database_type(v.database_type.clone());
+        let d =
+            v.description
+                .clone()
+                .into_iter()
+                .fold(HashMap::with_capacity(v.description.len()), |mut acc, (k, v)| {
+                    acc.insert(k, v);
+                    acc
+                });
+        r.set_description(d);
+        r.set_ip_version(v.ip_version as u32);
+        r.set_languages(::protobuf::RepeatedField::from_vec(v.languages.clone()));
+        r.set_node_count(v.node_count);
+        r.set_record_size(v.record_size as u32);
+        r
+    }
 }
 
 #[derive(Clone)]

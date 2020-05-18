@@ -4,7 +4,11 @@ package geoip2;
 
 service GeoIp {
   rpc Lookup(Message) returns (CityReply) {}
+  rpc Metadata(Empty) returns (MetadataReply) {}
+  rpc Reload(Empty) returns (MetadataReply) {}
 }
+
+message Empty {}
 
 message Message {
   string ip = 1;
@@ -79,4 +83,16 @@ message Subdivision {
 message Traits {
   oneof anonymous_proxy_option { bool anonymous_proxy = 1; }
   oneof satellite_provider_option { bool satellite_provider = 2; }
+}
+
+message MetadataReply {
+  uint32 binary_format_major_version = 1;
+  uint32 binary_format_minor_version = 2;
+  uint64 build_epoch = 3;
+  string database_type = 4;
+  map<string, string> description = 5;
+  uint32 ip_version = 6;
+  repeated string languages = 7;
+  uint32 node_count = 8;
+  uint32 record_size = 9;
 }
