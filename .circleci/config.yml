@@ -16,6 +16,7 @@ commands:
     steps:
       - checkout
       - run: rustup show
+      - run: rustup component add rustfmt clippy
       - install-protoc
       - restore_cache:
           keys:
