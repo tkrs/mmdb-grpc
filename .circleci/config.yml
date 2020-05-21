@@ -3,13 +3,14 @@ version: 2.1
 commands:
   install-protoc:
     steps:
-      - run: apt-get -qq update && apt-get -qq install -y cmake binutils-dev llvm clang curl unzip golang libunwind-dev
+      - run: sudo apt-get -qq update && sudo apt-get -qq install -y cmake binutils-dev llvm clang curl unzip golang libunwind-dev
       - run: 
           command: |
+            cd /tmp
             curl -OL https://github.com/google/protobuf/releases/download/v3.11.4/protoc-3.11.4-linux-x86_64.zip && \
               unzip protoc-3.11.4-linux-x86_64.zip -d protoc3 && \
-              mv protoc3/bin/* /usr/local/bin/ && \
-              mv protoc3/include/* /usr/local/include/ && \
+              sudo mv protoc3/bin/* /usr/local/bin/ && \
+              sudo mv protoc3/include/* /usr/local/include/ && \
               protoc --version
   build:
     steps:
