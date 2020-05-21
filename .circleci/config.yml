@@ -4,14 +4,13 @@ commands:
   install-protoc:
     steps:
       - run: sudo apt-get -qq update && sudo apt-get -qq install -y cmake binutils-dev llvm clang curl unzip golang libunwind-dev
-      - run: 
-          command: |
-            cd /tmp
-            curl -OL https://github.com/google/protobuf/releases/download/v3.11.4/protoc-3.11.4-linux-x86_64.zip && \
-              unzip protoc-3.11.4-linux-x86_64.zip -d protoc3 && \
-              sudo mv protoc3/bin/* /usr/local/bin/ && \
-              sudo mv protoc3/include/* /usr/local/include/ && \
-              protoc --version
+      - run: |
+          cd /tmp
+          curl -OL https://github.com/google/protobuf/releases/download/v3.11.4/protoc-3.11.4-linux-x86_64.zip
+          unzip protoc-3.11.4-linux-x86_64.zip -d protoc3
+          sudo mv protoc3/bin/* /usr/local/bin/
+          sudo mv protoc3/include/* /usr/local/include/
+      - run: protoc --version
   build:
     steps:
       - checkout
@@ -20,16 +19,23 @@ commands:
       - install-protoc
       - restore_cache:
           keys:
+            - target-v1-{{ checksum "Cargo.toml" }}-{{ .Environment.CIRCLE_JOB }}
+      - restore_cache:
+          keys:
             - deps-v1-cargo-{{ checksum "Cargo.toml" }}-{{ .Environment.CIRCLE_JOB }}
             - deps-v1-cargo-{{ checksum "Cargo.toml" }}
       - run: cargo fmt --all -- --color=always --check
-      - run: cargo clippy --all -- -D warnings
-      - run: cargo test --verbose --workspace
-      - run: cargo build --verbose --workspace
+      - run: cargo clippy --release --workspace -- -D warnings
+      - run: cargo test --release --verbose --workspace
+      - run: cargo build --release --verbose --workspace
       - save_cache:
           key: deps-v1-cargo-{{ checksum "Cargo.toml" }}-{{ .Environment.CIRCLE_JOB }}
           paths:
             - /usr/local/cargo/registry
+      - save_cache:
+          key: target-v1-{{ checksum "Cargo.toml" }}-{{ .Environment.CIRCLE_JOB }}-{{ epoch }}
+          paths:
+            - target/release
 
 jobs:
   stable:
@@ -39,6 +45,20 @@ jobs:
           RUSTUP_TOOLCHAIN: stable
     steps:
       - build
+      - setup_remote_docker
+      - run: docker build -f docker/server/Dockerfile -t tkrs/mmdb-server .
+      - run: docker build -f docker/reload/Dockerfile -t tkrs/mmdb-reload .
+      - run: echo ${DOCKER_PWD} | docker login -u tkrs --password-stdin
+      - run: |
+          if [[ "${CIRCLE_BRANCH:-}" == "master" ]]; then
+            docker push tkrs/mmdb-server
+            docker push tkrs/mmdb-reload
+          elif [[ "${CIRCLE_TAG:-}" != "" ]]; then
+            docker tag tkrs/mmdb-server "tkrs/mmdb-server:${CIRCLE_TAG}"
+            docker tag tkrs/mmdb-reload "tkrs/mmdb-reload:${CIRCLE_TAG}"
+            docker push "tkrs/mmdb-server:${CIRCLE_TAG}"
+            docker push "tkrs/mmdb-reload:${CIRCLE_TAG}"
+          fi
   beta:
     docker:
       - image: circleci/rust
@@ -56,8 +76,15 @@ jobs:
 
 workflows:
   version: 2
-  build:
+  stable-build:
     jobs:
-      - stable
+      - stable:
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)+$/
+  beta-build:
+    jobs:
       - beta
+  nightly-build:
+    jobs:
       - nightly
