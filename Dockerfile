@@ -22,13 +22,12 @@ COPY protos protos
 
 RUN mkdir src/proto
 RUN echo "fn main() {}" > src/server.rs
-# RUN echo "use protoc_grpcio\nfn main() {}" > build.rs
 
-RUN cargo clippy --release --bin mmdb-server -- -D warnings
 RUN cargo build --release --bin mmdb-server
 
 COPY . .
 
+RUN cargo clippy --release --bin mmdb-server -- -D warnings
 RUN cargo build --release --bin mmdb-server
 
 FROM debian:buster-slim

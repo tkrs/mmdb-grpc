@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+cronfile=/etc/cron.d/mmdb-reload
+
+if [ ! -f ${cronfile} ]; then
+  mkdir -p $(basename ${cronfile})
+  echo "${SCHEDULE} /usr/local/bin/mmdb-reload --host ${MMDB_SERVER_HOST} --port ${MMDB_SERVER_PORT} 1> /proc/1/fd/1 2>/proc/1/fd/2" > ${cronfile}
+fi
+
+crontab ${cronfile}

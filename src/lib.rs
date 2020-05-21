@@ -74,7 +74,7 @@ where
                 *guard = reader;
                 MetadataReply::from(&guard.metadata)
             })
-            .map_err(|e| convert_error(e));
+            .map_err(convert_error);
 
         let f = match result {
             Ok(reply) => sink.success(reply),
