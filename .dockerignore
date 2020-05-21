@@ -1,2 +1,4 @@
 *.mmdb
 ./target
+!target/release/mmdb-reload
+!target/release/mmdb-server

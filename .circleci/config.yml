@@ -1,0 +1,61 @@
+version: 2.1
+
+commands:
+  install-protoc:
+    steps:
+      - run: apt-get -qq update && apt-get -qq install -y cmake binutils-dev llvm clang curl unzip golang libunwind-dev
+      - run: 
+          command: |
+            curl -OL https://github.com/google/protobuf/releases/download/v3.11.4/protoc-3.11.4-linux-x86_64.zip && \
+              unzip protoc-3.11.4-linux-x86_64.zip -d protoc3 && \
+              mv protoc3/bin/* /usr/local/bin/ && \
+              mv protoc3/include/* /usr/local/include/ && \
+              protoc --version
+  build:
+    steps:
+      - checkout
+      - run: rustup show
+      - install-protoc
+      - restore_cache:
+          keys:
+            - deps-v1-cargo-{{ checksum "Cargo.toml" }}-{{ .Environment.CIRCLE_JOB }}
+            - deps-v1-cargo-{{ checksum "Cargo.toml" }}
+      - run: cargo fmt --all -- --color=always --check
+      - run: cargo clippy --all -- -D warnings
+      - run: cargo test --verbose --workspace
+      - run: cargo build --verbose --workspace
+      - save_cache:
+          key: deps-v1-cargo-{{ checksum "Cargo.toml" }}-{{ .Environment.CIRCLE_JOB }}
+          paths:
+            - /usr/local/cargo/registry
+
+jobs:
+  stable:
+    docker:
+      - image: circleci/rust
+        environment:
+          RUSTUP_TOOLCHAIN: stable
+    steps:
+      - build
+  beta:
+    docker:
+      - image: circleci/rust
+        environment:
+          RUSTUP_TOOLCHAIN: beta
+    steps:
+      - build
+  nightly:
+    docker:
+      - image: circleci/rust
+        environment:
+          RUSTUP_TOOLCHAIN: nightly
+    steps:
+      - build
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - stable
+      - beta
+      - nightly
