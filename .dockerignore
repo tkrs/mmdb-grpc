@@ -1,4 +1,2 @@
 *.mmdb
 ./target
-./src/proto/geoip2_grpc.rs
-./src/proto/geoip2.rs

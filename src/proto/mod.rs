@@ -1,2 +1,1 @@
-pub mod geoip2;
-pub mod geoip2_grpc;
+include!(concat!(env!("OUT_DIR"), "/proto/mod.rs"));

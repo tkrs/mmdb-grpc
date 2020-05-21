@@ -18,7 +18,7 @@ signal-hook = "0.1"
 spin = "0.5"
 
 [build-dependencies]
-protoc-grpcio = "1.2"
+protobuf-build = { version = "0.11", default-features = false }
 
 [[bin]]
 name = "mmdb-server"
