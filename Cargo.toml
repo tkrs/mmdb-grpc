@@ -24,6 +24,10 @@ protoc-grpcio = "1.2"
 name = "mmdb-server"
 path = "src/server.rs"
 
+[[bin]]
+name = "mmdb-reload"
+path = "src/reloader.rs"
+
 [profile.release]
 debug = true
 lto = true
