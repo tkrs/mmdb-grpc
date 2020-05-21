@@ -3,6 +3,13 @@ name = "mmdb-grpc"
 version = "0.1.0"
 authors = ["Takeru Sato <type.in.type@gmail.com>"]
 edition = "2018"
+description = "The gRPC service for the GeoIP database of MaxMind"
+documentation = "https://github.com/tkrs/mmdb-grpc"
+homepage = "https://github.com/tkrs/mmdb-grpc"
+repository = "https://github.com/tkrs/mmdb-grpc.git"
+readme = "README.md"
+license = "MIT"
+keywords = ["maxmind", "geoip"]
 
 [dependencies]
 clap = "3.0.0-beta.1"
