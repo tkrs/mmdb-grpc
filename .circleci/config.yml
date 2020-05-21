@@ -25,7 +25,7 @@ commands:
             - deps-v1-cargo-{{ checksum "Cargo.toml" }}-{{ .Environment.CIRCLE_JOB }}
             - deps-v1-cargo-{{ checksum "Cargo.toml" }}
       - run: cargo fmt --all -- --color=always --check
-      - run: cargo clippy --release --workspace -- -D warnings
+      - run: cargo clippy --workspace -- -D warnings
       - run: cargo test --release --verbose --workspace
       - run: cargo build --release --verbose --workspace
       - save_cache:
