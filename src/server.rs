@@ -1,4 +1,4 @@
-use clap::Clap;
+use clap::{crate_version, Clap};
 use crossbeam_channel::{bounded, select, Receiver};
 use futures::Future;
 use grpcio::{ChannelBuilder, Environment, ServerBuilder};
@@ -13,7 +13,7 @@ use std::sync::Arc;
 use std::thread;
 
 #[derive(Clap)]
-#[clap(version = "0.1", author = "Takeru Sato <type.in.type@gmail.com>")]
+#[clap(version = crate_version!(), author = "Takeru Sato <type.in.type@gmail.com>")]
 struct Opts {
     #[clap(short = "h", long = "host", default_value = "localhost")]
     host: String,
@@ -45,7 +45,7 @@ impl Opts {
 fn main() {
     env_logger::init();
 
-    let opts: Opts = Opts::parse();
+    let opts = Opts::parse();
 
     let reader = mmdb::Reader::open_readfile(opts.mmdb_path()).unwrap();
     let mmdb = Arc::new(RwLock::new(reader));
@@ -78,7 +78,8 @@ fn main() {
     let mut server = builder.build().unwrap();
     server.start();
 
-    info!("started mmdb-grpc server listening on {}:{}", opts.host(), opts.port());
+    let (h, p) = server.bind_addrs().next().unwrap();
+    info!("started mmdb-grpc server listening on {}:{}", h, p);
 
     let mmdb_path = opts.mmdb_path();
     let term_event = terminate_channel().unwrap();
