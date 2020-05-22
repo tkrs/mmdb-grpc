@@ -23,6 +23,8 @@ maxminddb = "0.13"
 protobuf = "2.14"
 signal-hook = "0.1"
 spin = "0.5"
+cron = "0.6"
+chrono = "0.4"
 
 [build-dependencies]
 protobuf-build = { version = "0.11", default-features = false }
