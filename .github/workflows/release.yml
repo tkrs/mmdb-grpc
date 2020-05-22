@@ -1,0 +1,48 @@
+name: release
+
+on:
+  push:
+    branches:
+      - 'master'
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: install stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable-x86_64-unknown-linux-gnu
+          override: true
+      - name: builds
+        uses: actions-rs/cargo@v1
+        timeout-minutes: 5
+        with:
+          command: build
+          args: --workspace --release --verbose
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      - name: get the version
+        id: get_version
+        run: |
+          v="${GITHUB_REF##*/}" 
+          if [[ "$v" == "master" ]]; then
+            echo ::set-output name=VERSION::latest
+          else
+            echo ::set-output name=VERSION::${v}
+          fi
+      - name: build mmdb-server
+        run: docker build -f docker/server/Dockerfile -t tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }} .
+      - name: show mmdb-server version
+        run: docker run --rm --it tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }} --version
+      - name: push mmdb-server
+        run: docker push tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }}
+      - name: build mmdb-reload image
+        run: docker build -f docker/reload/Dockerfile -t tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }} .
+      - name: show mmdb-reload version
+        run: docker run --rm --it tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }} --version
+      - name: push mmdb-reload image
+        run: docker push tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }}

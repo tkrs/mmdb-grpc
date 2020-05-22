@@ -1,0 +1,48 @@
+name: build
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  test_and_build:
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - 1.41.0
+          - stable
+          - nightly
+    name: ${{ matrix.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: install ${{ matrix.version }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.version }}-x86_64-unknown-linux-gnu
+          components: rustfmt, clippy
+          override: true
+      - name: cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --color=always --check
+      - name: cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --workspace -- -D warnings
+      - name: tests
+        uses: actions-rs/cargo@v1
+        timeout-minutes: 20
+        with:
+          command: test
+          args: --workspace --no-fail-fast -- --nocapture
+      - name: builds
+        uses: actions-rs/cargo@v1
+        timeout-minutes: 5
+        with:
+          command: build
+          args: --workspace --verbose
