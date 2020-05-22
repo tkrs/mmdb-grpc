@@ -345,3 +345,38 @@ impl Health for HealthService {
         );
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_filter_locales() {
+        let mut src = BTreeMap::new();
+        src.insert("1".to_string(), "one".to_string());
+        src.insert("2".to_string(), "two".to_string());
+        src.insert("3".to_string(), "three".to_string());
+        src.insert("4".to_string(), "four".to_string());
+
+        let mut filters = HashSet::new();
+        filters.insert("11".to_string());
+        filters.insert("2".to_string());
+        filters.insert("3".to_string());
+        let actual = filter_locales(src.clone(), &filters);
+
+        let mut expected = HashMap::new();
+        expected.insert("2".to_string(), "two".to_string());
+        expected.insert("3".to_string(), "three".to_string());
+        assert_eq!(actual, expected);
+
+        let filters = HashSet::new();
+        let actual = filter_locales(src, &filters);
+
+        let mut expected = HashMap::new();
+        expected.insert("1".to_string(), "one".to_string());
+        expected.insert("2".to_string(), "two".to_string());
+        expected.insert("3".to_string(), "three".to_string());
+        expected.insert("4".to_string(), "four".to_string());
+        assert_eq!(actual, expected);
+    }
+}
