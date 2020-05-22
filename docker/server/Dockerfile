@@ -15,4 +15,4 @@ ENV RUST_BACKTRACE=1
 COPY --from=builder /tmp/grpc_health_probe /usr/local/bin/
 COPY target/release/mmdb-server /usr/local/bin/
 
-ENTRYPOINT  [ "/usr/local/bin/mmdb-server" ]
+ENTRYPOINT [ "/usr/local/bin/mmdb-server" ]
