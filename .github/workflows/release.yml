@@ -36,12 +36,12 @@ jobs:
       - name: build mmdb-server
         run: docker build -f docker/server/Dockerfile -t tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }} .
       - name: show mmdb-server version
-        run: docker run --rm --it tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }} --version
+        run: docker run --rm -it tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }} --version
       - name: push mmdb-server
         run: docker push tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }}
       - name: build mmdb-reload image
         run: docker build -f docker/reload/Dockerfile -t tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }} .
       - name: show mmdb-reload version
-        run: docker run --rm --it tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }} --version
+        run: docker run --rm -it tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }} --version
       - name: push mmdb-reload image
         run: docker push tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }}
