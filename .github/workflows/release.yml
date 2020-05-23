@@ -19,7 +19,6 @@ jobs:
           override: true
       - name: builds
         uses: actions-rs/cargo@v1
-        timeout-minutes: 5
         with:
           command: build
           args: --workspace --release --verbose
