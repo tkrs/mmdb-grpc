@@ -33,6 +33,8 @@ jobs:
             release-stable-sccache-0213-cache-
       - name: start sccache with show stats
         run: sccache --show-stats
+      - name: Set up RUSTC_WRAPPER
+        run: echo "::set-env RUSTC_WRAPPER=sccache"
       - name: get the version
         id: get_version
         run: |
@@ -45,24 +47,18 @@ jobs:
       - name: checks
         uses: actions-rs/cargo@v1
         if: steps.get_version.outputs.VERSION == 'latest'
-        env:
-          RUSTC_WRAPPER: sccache
         with:
           command: check
           args: --tests --workspace --release --verbose
       - name: tests
         if: steps.get_version.outputs.VERSION == 'latest'
         uses: actions-rs/cargo@v1
-        env:
-          RUSTC_WRAPPER: sccache
         timeout-minutes: 20
         with:
           command: test
           args: --workspace --release --verbose --no-fail-fast -- --nocapture
       - name: builds
         uses: actions-rs/cargo@v1
-        env:
-          RUSTC_WRAPPER: sccache
         with:
           command: build
           args: --workspace --release --verbose
