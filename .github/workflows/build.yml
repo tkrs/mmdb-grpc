@@ -1,4 +1,4 @@
-name: build
+name: Build
 
 on:
   push:
@@ -14,53 +14,69 @@ jobs:
           - 1.41.0
           - stable
           - nightly
-    name: ${{ matrix.version }}
+    name: Test and Build - ${{ matrix.version }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: install ${{ matrix.version }}
+      - name: Install ${{ matrix.version }}
         uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.version }}-x86_64-unknown-linux-gnu
           components: rustfmt
           override: true
-      - name: install sccache
+      - name: Install sccache
         env:
           SCCACHE_LINK: https://github.com/mozilla/sccache/releases/download
           SCCACHE_VERSION: 0.2.13
         run: |
           curl -L "$SCCACHE_LINK/$SCCACHE_VERSION/sccache-$SCCACHE_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xz
           echo "::add-path::$PWD/sccache-$SCCACHE_VERSION-x86_64-unknown-linux-musl/"
-      - name: cache sccache files
+      - name: Cache sccache files
         uses: actions/cache@v1
         with:
           path: ~/.cache/sccache
           key: ${{ matrix.version }}-sccache-0213-cache-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             ${{ matrix.version }}-sccache-0213-cache-
-      - name: show sccache stats
+      - name: Show sccache stats
         run: sccache --show-stats
       - name: Set up RUSTC_WRAPPER
         run: echo "::set-env name=RUSTC_WRAPPER::sccache"
-      - name: cargo fmt
+      - name: Rustfmt
         uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --color=always --check
-      - name: checks
+      - name: Cargo check
         uses: actions-rs/cargo@v1
         with:
           command: check
           args: --tests --workspace --verbose
-      - name: tests
+      - name: Cargo test
         uses: actions-rs/cargo@v1
         timeout-minutes: 20
         with:
           command: test
           args: --workspace --verbose --no-fail-fast -- --nocapture
-      - name: builds
+      - name: Cargo build
         uses: actions-rs/cargo@v1
         timeout-minutes: 5
         with:
           command: build
           args: --workspace --verbose
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Install toolchain and components
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable-x86_64-unknown-linux-gnu
+          components: clippy
+          override: true
+      - name: Cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --workspace --verbose -- -D warnings

@@ -1,8 +1,8 @@
 # mmdb-grpc
 
 [![crates.io](https://meritbadge.herokuapp.com/mmdb-grpc)](https://crates.io/crates/mmdb-grpc)
-![](https://github.com/tkrs/mmdb-grpc/workflows/build/badge.svg)
-![](https://github.com/tkrs/mmdb-grpc/workflows/release/badge.svg)
+![](https://github.com/tkrs/mmdb-grpc/workflows/Build/badge.svg)
+![](https://github.com/tkrs/mmdb-grpc/workflows/Release/badge.svg)
 [![Docker Image Pulls](https://img.shields.io/docker/pulls/tkrs/mmdb-server "Docker Image Pulls")](https://img.shields.io/docker/pulls/tkrs/mmdb-server)
 [![Docker Image Pulls](https://img.shields.io/docker/pulls/tkrs/mmdb-reload "Docker Image Pulls")](https://img.shields.io/docker/pulls/tkrs/mmdb-reload)
 
