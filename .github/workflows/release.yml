@@ -42,12 +42,25 @@ jobs:
           else
             echo ::set-output name=VERSION::${v}
           fi
-      - name: builds
+      - name: checks
         uses: actions-rs/cargo@v1
         env:
           RUSTC_WRAPPER: sccache
         with:
           command: check
+          args: --tests --workspace --release --verbose
+      - name: tests
+        uses: actions-rs/cargo@v1
+        timeout-minutes: 20
+        with:
+          command: test
+          args: --workspace --verbose --no-fail-fast -- --nocapture
+      - name: builds
+        uses: actions-rs/cargo@v1
+        env:
+          RUSTC_WRAPPER: sccache
+        with:
+          command: build
           args: --workspace --release --verbose
       - name: stop sccache
         run: sccache --stop-server
