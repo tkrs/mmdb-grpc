@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.cache/sccache
-          key: release-stable-sccache-0213-cache-${{ hashFiles('**/Cargo.lock') }}
+          key: release-stable-sccache-0213-cache-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             release-stable-sccache-0213-cache-
       - name: show sccache stats
