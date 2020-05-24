@@ -44,19 +44,21 @@ jobs:
           fi
       - name: checks
         uses: actions-rs/cargo@v1
+        if: steps.get_version.outputs.VERSION == 'latest'
         env:
           RUSTC_WRAPPER: sccache
         with:
           command: check
           args: --tests --workspace --release --verbose
       - name: tests
+        if: steps.get_version.outputs.VERSION == 'latest'
         uses: actions-rs/cargo@v1
         env:
           RUSTC_WRAPPER: sccache
         timeout-minutes: 20
         with:
           command: test
-          args: --workspace --verbose --no-fail-fast -- --nocapture
+          args: --workspace --release --verbose --no-fail-fast -- --nocapture
       - name: builds
         uses: actions-rs/cargo@v1
         env:
