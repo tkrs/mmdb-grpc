@@ -51,6 +51,8 @@ jobs:
           args: --tests --workspace --release --verbose
       - name: tests
         uses: actions-rs/cargo@v1
+        env:
+          RUSTC_WRAPPER: sccache
         timeout-minutes: 20
         with:
           command: test
