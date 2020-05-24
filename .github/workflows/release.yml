@@ -31,10 +31,10 @@ jobs:
           key: release-stable-sccache-0213-cache-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             release-stable-sccache-0213-cache-
-      - name: start sccache with show stats
+      - name: show sccache stats
         run: sccache --show-stats
       - name: Set up RUSTC_WRAPPER
-        run: echo "::set-env RUSTC_WRAPPER=sccache"
+        run: echo "::set-env name=RUSTC_WRAPPER::sccache"
       - name: get the version
         id: get_version
         run: |
@@ -62,8 +62,6 @@ jobs:
         with:
           command: build
           args: --workspace --release --verbose
-      - name: stop sccache
-        run: sccache --stop-server
       - name: login to DockerHub Registry
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
       - name: build mmdb-server
