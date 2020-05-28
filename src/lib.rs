@@ -192,7 +192,7 @@ impl<'a> From<MCountry<'a>> for Country {
             r.set_geoname_id(a);
         }
         if let Some(a) = c.0.is_in_european_union {
-            r.set_in_european_union(a);
+            r.is_in_european_union = a;
         }
         if let Some(a) = c.0.iso_code {
             r.set_iso_code(a);
@@ -276,10 +276,10 @@ impl From<geoip2::model::Traits> for Traits {
     fn from(c: geoip2::model::Traits) -> Traits {
         let mut t = Traits::default();
         if let Some(v) = c.is_anonymous_proxy {
-            t.set_anonymous_proxy(v);
+            t.is_anonymous_proxy = v;
         }
         if let Some(v) = c.is_satellite_provider {
-            t.set_satellite_provider(v);
+            t.is_satellite_provider = v;
         }
         t
     }

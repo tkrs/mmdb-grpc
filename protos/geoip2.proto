@@ -52,7 +52,7 @@ message Continent {
 
 message Country {
   oneof geoname_id_option { uint32 geoname_id = 1; }
-  oneof in_european_union_option { bool in_european_union = 2; }
+  bool is_in_european_union = 2;
   oneof iso_code_option { string iso_code = 3; }
   map<string, string> names = 4;
 }
@@ -81,8 +81,8 @@ message Subdivision {
 }
 
 message Traits {
-  oneof anonymous_proxy_option { bool anonymous_proxy = 1; }
-  oneof satellite_provider_option { bool satellite_provider = 2; }
+  bool is_anonymous_proxy = 1;
+  bool is_satellite_provider = 2;
 }
 
 message MetadataReply {
