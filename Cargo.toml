@@ -1,6 +1,6 @@
 [package]
 name = "mmdb-grpc"
-version = "0.2.1-alpha.0"
+version = "0.3.0"
 authors = ["Takeru Sato <type.in.type@gmail.com>"]
 edition = "2018"
 description = "The gRPC service for the GeoIP database of MaxMind"
