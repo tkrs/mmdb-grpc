@@ -96,6 +96,7 @@ impl ToString for Message_Locale {
             Message_Locale::RUSSIAN => "ru".into(),
             Message_Locale::SIMPLIFIED_CHINESE => "zh-CN".into(),
             Message_Locale::SPANISH => "es".into(),
+            Message_Locale::UNSPECIFIED => "".into(), // TODO: should it panic?
         }
     }
 }

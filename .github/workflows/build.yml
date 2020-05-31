@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - run: git submodule update --init --recursive
       - name: Install ${{ matrix.version }}
         uses: actions-rs/toolchain@v1
         with:
@@ -69,6 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - run: git submodule update --init --recursive
       - name: Install toolchain and components
         uses: actions-rs/toolchain@v1
         with:
