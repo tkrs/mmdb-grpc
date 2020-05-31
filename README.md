@@ -19,7 +19,7 @@ The gRPC service that provides a query to [maxminddb](https://docs.rs/crate/maxm
 
 ```
 ❯ mmdb-server --help
-mmdb-grpc 0.1
+mmdb-grpc 0.3.0
 Takeru Sato <type.in.type@gmail.com>
 
 USAGE:
@@ -40,7 +40,7 @@ OPTIONS:
 
 ```
 ❯ mmdb-reload --help
-mmdb-grpc 0.2.1-alpha.0
+mmdb-grpc 0.3.0
 Takeru Sato <type.in.type@gmail.com>
 
 USAGE:
