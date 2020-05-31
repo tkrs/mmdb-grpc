@@ -1,0 +1,4 @@
+[submodule "protos"]
+	path = protos
+	url = https://github.com/tkrs/mmdb-protobuf
+	branch = release-v1.0.0
