@@ -25,6 +25,10 @@ message Message {
   repeated Locale locales = 2;
 }
 
+/**
+ * CityReply represents MaxMind's GeoLite2 databases.
+ * See https://docs.rs/maxminddb/0.13.0/maxminddb/geoip2/struct.City.html
+ */
 message CityReply {
   oneof city_option { City city = 1; }
   oneof continent_option { Continent continent = 2; }

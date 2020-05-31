@@ -6,6 +6,8 @@
 [![Docker Image Pulls](https://img.shields.io/docker/pulls/tkrs/mmdb-server "Docker Image Pulls")](https://img.shields.io/docker/pulls/tkrs/mmdb-server)
 [![Docker Image Pulls](https://img.shields.io/docker/pulls/tkrs/mmdb-reload "Docker Image Pulls")](https://img.shields.io/docker/pulls/tkrs/mmdb-reload)
 
+The gRPC service that provides a query to [maxminddb](https://docs.rs/crate/maxminddb/)
+
 ## Usage
 
 ```

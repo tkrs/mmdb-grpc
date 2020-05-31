@@ -25,9 +25,6 @@ impl Opts {
     fn host(&self) -> &String {
         &self.host
     }
-    fn port(&self) -> u16 {
-        self.port
-    }
 }
 
 fn main() -> Result<(), Error> {
@@ -36,7 +33,7 @@ fn main() -> Result<(), Error> {
     let opts = Opts::parse();
 
     let env = Arc::new(EnvBuilder::new().build());
-    let ch = ChannelBuilder::new(env).connect(format!("{}:{}", opts.host(), opts.port()).as_ref());
+    let ch = ChannelBuilder::new(env).connect(format!("{}:{}", opts.host(), opts.port).as_ref());
     let client = GeoIpClient::new(ch);
 
     if let Some(ref expr) = opts.schedule {
