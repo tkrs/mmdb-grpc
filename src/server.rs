@@ -1,6 +1,6 @@
 use clap::{crate_version, Clap};
 use crossbeam_channel::{bounded, select, Receiver};
-use futures::Future;
+use futures::executor::block_on;
 use grpcio::{ChannelBuilder, Environment, ServerBuilder};
 use grpcio_proto::health::v1::health::*;
 use log::{error, info};
@@ -99,7 +99,7 @@ fn main() {
         }
     }
 
-    let _ = server.shutdown().wait();
+    let _ = block_on(server.shutdown());
 }
 
 fn terminate_channel() -> Result<Receiver<()>, String> {

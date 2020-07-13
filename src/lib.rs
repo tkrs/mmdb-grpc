@@ -2,7 +2,7 @@ pub mod proto;
 
 use crate::proto::geoip2::*;
 use crate::proto::geoip2_grpc::*;
-use futures::Future;
+use futures::prelude::*;
 use grpcio::{RpcContext, RpcStatus, RpcStatusCode, UnarySink};
 use grpcio_proto::health::v1::health::*;
 use log::{debug, error};
@@ -32,7 +32,7 @@ where
     T: AsRef<[u8]>,
     R: Fn() -> Result<maxminddb::Reader<T>, MaxMindDBError>,
 {
-    fn lookup(&mut self, ctx: RpcContext, req: Message, sink: UnarySink<CityReply>) {
+    fn lookup(&mut self, ctx: RpcContext<'_>, req: Message, sink: UnarySink<CityReply>) {
         debug!("received the message: {:?}", req);
 
         let Message { ip, locales, .. } = req;
@@ -60,14 +60,23 @@ where
             Err(status) => sink.fail(status),
         };
 
-        ctx.spawn(f.map_err(move |err| error!("failed to reply, cause: {:?}", err)))
+        let f = f
+            .map_err(move |err| error!("failed to reply, cause: {:?}", err))
+            .map(|_| ());
+
+        ctx.spawn(f)
     }
-    fn metadata(&mut self, ctx: RpcContext, _req: Empty, sink: UnarySink<MetadataReply>) {
+
+    fn metadata(&mut self, ctx: RpcContext<'_>, _req: Empty, sink: UnarySink<MetadataReply>) {
         let result = MetadataReply::from(&self.0.read().metadata);
-        let f = sink.success(result);
-        ctx.spawn(f.map_err(move |err| error!("failed to reply, cause: {:?}", err)))
+        let f = sink
+            .success(result)
+            .map_err(move |err| error!("failed to reply, cause: {:?}", err))
+            .map(|_| ());
+        ctx.spawn(f)
     }
-    fn reload(&mut self, ctx: RpcContext, _req: Empty, sink: UnarySink<MetadataReply>) {
+
+    fn reload(&mut self, ctx: RpcContext<'_>, _req: Empty, sink: UnarySink<MetadataReply>) {
         let result = self.1()
             .map(|reader| {
                 let mut guard = self.0.write();
@@ -81,7 +90,11 @@ where
             Err(status) => sink.fail(status),
         };
 
-        ctx.spawn(f.map_err(move |err| error!("failed to reply, cause: {:?}", err)))
+        let f = f
+            .map_err(move |err| error!("failed to reply, cause: {:?}", err))
+            .map(|_| ());
+
+        ctx.spawn(f)
     }
 }
 
