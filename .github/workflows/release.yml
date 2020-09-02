@@ -72,3 +72,19 @@ jobs:
           repository: ${{ github.repository }}/mmdb-reload
           dockerfile: docker/reload/Dockerfile
           tag_with_ref: true
+      - name: mmdb-server push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ secrets.DOCKERHUB_USER }}/mmdb-server
+          dockerfile: docker/server/Dockerfile
+          tag_with_ref: true
+      - name: mmdb-reload push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ secrets.DOCKERHUB_USER }}/mmdb-reload
+          dockerfile: docker/reload/Dockerfile
+          tag_with_ref: true
