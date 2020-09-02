@@ -36,23 +36,14 @@ jobs:
         run: sccache --show-stats
       - name: Set up RUSTC_WRAPPER
         run: echo "::set-env name=RUSTC_WRAPPER::sccache"
-      - name: get the version
-        id: get_version
-        run: |
-          v="${GITHUB_REF##*/}"
-          if [[ "$v" == "master" ]]; then
-            echo ::set-output name=VERSION::latest
-          else
-            echo ::set-output name=VERSION::${v}
-          fi
       - name: checks
         uses: actions-rs/cargo@v1
-        if: steps.get_version.outputs.VERSION == 'latest'
+        if: github.ref == 'refs/heads/master'
         with:
           command: check
           args: --tests --workspace --release --verbose
       - name: tests
-        if: steps.get_version.outputs.VERSION == 'latest'
+        if: github.ref == 'refs/heads/master'
         uses: actions-rs/cargo@v1
         timeout-minutes: 20
         with:
@@ -63,17 +54,27 @@ jobs:
         with:
           command: build
           args: --workspace --release --verbose
-      - name: login to DockerHub Registry
-        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-      - name: build mmdb-server
-        run: docker build -f docker/server/Dockerfile -t tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }} .
-      - name: show mmdb-server version
-        run: docker run tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }} --version
-      - name: push mmdb-server
-        run: docker push tkrs/mmdb-server:${{ steps.get_version.outputs.VERSION }}
-      - name: build mmdb-reload image
-        run: docker build -f docker/reload/Dockerfile -t tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }} .
+      - name: mmdb-server push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: ${{ github.repository }}/mmdb-server
+          dockerfile: docker/server/Dockerfile
+          tag_with_ref: true
+      - name: mmdb-reload push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: ${{ github.repository }}/mmdb-reload
+          dockerfile: docker/reload/Dockerfile
+          tag_with_ref: true
+      - name: sserverhow mmdb-server version
+        if: github.ref == 'refs/heads/master'
+        run: docker run ${{ github.repository }}/mmdb-server --version
       - name: show mmdb-reload version
-        run: docker run tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }} --version
-      - name: push mmdb-reload image
-        run: docker push tkrs/mmdb-reload:${{ steps.get_version.outputs.VERSION }}
+        if: github.ref == 'refs/heads/master'
+        run: docker run ${{ github.actor }}/${{ github.repository_name }}/mmdb-reload --version
