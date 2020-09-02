@@ -88,3 +88,21 @@ jobs:
           repository: ${{ secrets.DOCKERHUB_USER }}/mmdb-reload
           dockerfile: docker/reload/Dockerfile
           tag_with_ref: true
+      - name: mmdb-server push to Quay.io
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
+          registry: quay.io
+          repository: ${{ secrets.QUAY_USER }}/mmdb-server
+          dockerfile: docker/server/Dockerfile
+          tag_with_ref: true
+      - name: mmdb-reload push to DQuay.io
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
+          registry: quay.io
+          repository: ${{ secrets.QUAY_USER }}/mmdb-reload
+          dockerfile: docker/reload/Dockerfile
+          tag_with_ref: true
