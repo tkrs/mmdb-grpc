@@ -3,8 +3,6 @@
 [![crates.io](https://meritbadge.herokuapp.com/mmdb-grpc)](https://crates.io/crates/mmdb-grpc)
 ![](https://github.com/tkrs/mmdb-grpc/workflows/Build/badge.svg)
 ![](https://github.com/tkrs/mmdb-grpc/workflows/Release/badge.svg)
-[![Docker Image Pulls](https://img.shields.io/docker/pulls/tkrs/mmdb-server "Docker Image Pulls")](https://img.shields.io/docker/pulls/tkrs/mmdb-server)
-[![Docker Image Pulls](https://img.shields.io/docker/pulls/tkrs/mmdb-reload "Docker Image Pulls")](https://img.shields.io/docker/pulls/tkrs/mmdb-reload)
 
 The gRPC service that provides a query to [maxminddb](https://docs.rs/crate/maxminddb/)
 
@@ -12,14 +10,11 @@ The gRPC service that provides a query to [maxminddb](https://docs.rs/crate/maxm
 
 ```
 ❯ cargo install mmdb-grpc
-
-...
-
 ```
 
 ```
 ❯ mmdb-server --help
-mmdb-grpc 0.4.0
+mmdb-grpc x.y.z
 Takeru Sato <type.in.type@gmail.com>
 
 USAGE:
@@ -40,7 +35,7 @@ OPTIONS:
 
 ```
 ❯ mmdb-reload --help
-mmdb-grpc 0.4.0
+mmdb-grpc x.y.z
 Takeru Sato <type.in.type@gmail.com>
 
 USAGE:
