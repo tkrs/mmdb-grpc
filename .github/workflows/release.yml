@@ -72,9 +72,3 @@ jobs:
           repository: ${{ github.repository }}/mmdb-reload
           dockerfile: docker/reload/Dockerfile
           tag_with_ref: true
-      - name: sserverhow mmdb-server version
-        if: github.ref == 'refs/heads/master'
-        run: docker run ${{ github.repository }}/mmdb-server --version
-      - name: show mmdb-reload version
-        if: github.ref == 'refs/heads/master'
-        run: docker run ${{ github.actor }}/${{ github.repository_name }}/mmdb-reload --version
