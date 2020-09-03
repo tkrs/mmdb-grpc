@@ -54,22 +54,22 @@ jobs:
         with:
           command: build
           args: --workspace --release --verbose
-      - name: mmdb-server push to GitHub Packages
+      - name: mmdb-server push to GitHub Container Packages
         uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: ${{ github.repository }}/mmdb-server
+          password: ${{ secrets.GHCR_TOKEN }}
+          registry: ghcr.io
+          repository: ${{ github.actor }}/mmdb-server
           dockerfile: docker/server/Dockerfile
           tag_with_ref: true
-      - name: mmdb-reload push to GitHub Packages
+      - name: mmdb-reload push to GitHub Container Packages
         uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: ${{ github.repository }}/mmdb-reload
+          password: ${{ secrets.GHCR_TOKEN }}
+          registry: ghcr.io
+          repository: ${{ github.actor }}/mmdb-reload
           dockerfile: docker/reload/Dockerfile
           tag_with_ref: true
       - name: mmdb-server push to Docker Hub
