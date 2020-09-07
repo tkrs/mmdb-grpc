@@ -106,14 +106,14 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          file: dokcer/server/Dockerfile
+          file: docker/server/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USER }}/mmdb-server:${{ steps.get_version.outputs.VERSION }}
           push: true
       - name: mmdb-reload push to Docker Hub
         uses: docker/build-push-action@v2
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          file: dokcer/reload/Dockerfile
+          file: docker/reload/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USER }}/mmdb-reload:${{ steps.get_version.outputs.VERSION }}
           push: true
 
