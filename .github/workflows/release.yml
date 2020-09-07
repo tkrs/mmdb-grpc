@@ -87,31 +87,47 @@ jobs:
             echo ::set-output name=VERSION::${v}
           fi
 
-      - name: push to GitHub Container Registry
+      - name: mmdb-server push to GitHub Container Registry
         uses: docker/build-push-action@v2
-        env:
-          REGISTRY: ghcr.io
-          USERNAME: ${{ github.repository_owner }}
-          TAG: ${{ steps.get_version.outputs.VERSION }}
         with:
-          file: docker-bake.hcl
+          builder: ${{ steps.buildx.outputs.name }}
+          file: docker/server/Dockerfile
+          tags: ghcr.io/${{ github.repository_owner }}/mmdb-server:${{ steps.get_version.outputs.VERSION }}
+          push: true
+      - name: mmdb-reload push to GitHub Container Registry
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          file: docker/reload/Dockerfile
+          tags: ghcr.io/${{ github.repository_owner }}/mmdb-reload:${{ steps.get_version.outputs.VERSION }}
           push: true
 
-      - name: push to Docker Hub
+      - name: mmdb-server push to Docker Hub
         uses: docker/build-push-action@v2
-        env:
-          USERNAME: ${{ secrets.DOCKERHUB_USER }}
-          TAG: ${{ steps.get_version.outputs.VERSION }}
         with:
-          file: docker-bake.hcl
+          builder: ${{ steps.buildx.outputs.name }}
+          file: dokcer/server/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USER }}/mmdb-server:${{ steps.get_version.outputs.VERSION }}
+          push: true
+      - name: mmdb-reload push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          file: dokcer/reload/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USER }}/mmdb-reload:${{ steps.get_version.outputs.VERSION }}
           push: true
 
-      - name: push to Quay.io
+      - name: mmdb-server push to Quay.io
         uses: docker/build-push-action@v2
-        env:
-          REGISTRY: quay.io
-          USERNAME: ${{ secrets.QUAY_USER }}
-          TAG: ${{ steps.get_version.outputs.VERSION }}
         with:
-          file: docker-bake.hcl
+          builder: ${{ steps.buildx.outputs.name }}
+          file: docker/server/Dockerfile
+          tags: quay.io/${{ secrets.QUAY_USER }}/mmdb-server:${{ steps.get_version.outputs.VERSION }}
+          push: true
+      - name: mmdb-reload push to Quay.io
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          file: docker/reload/Dockerfile
+          tags: quay.io/${{ secrets.QUAY_USER }}/mmdb-reload:${{ steps.get_version.outputs.VERSION }}
           push: true
