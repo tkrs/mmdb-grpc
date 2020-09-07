@@ -55,7 +55,7 @@ jobs:
           command: build
           args: --workspace --release --verbose
       - name: mmdb-server push to GitHub Container Packages
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
@@ -64,7 +64,7 @@ jobs:
           dockerfile: docker/server/Dockerfile
           tag_with_ref: true
       - name: mmdb-reload push to GitHub Container Packages
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
@@ -73,7 +73,7 @@ jobs:
           dockerfile: docker/reload/Dockerfile
           tag_with_ref: true
       - name: mmdb-server push to Docker Hub
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -81,7 +81,7 @@ jobs:
           dockerfile: docker/server/Dockerfile
           tag_with_ref: true
       - name: mmdb-reload push to Docker Hub
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -89,7 +89,7 @@ jobs:
           dockerfile: docker/reload/Dockerfile
           tag_with_ref: true
       - name: mmdb-server push to Quay.io
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
@@ -98,7 +98,7 @@ jobs:
           dockerfile: docker/server/Dockerfile
           tag_with_ref: true
       - name: mmdb-reload push to DQuay.io
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
