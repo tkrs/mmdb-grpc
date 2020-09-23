@@ -10,9 +10,9 @@ use std::sync::Arc;
 struct Opts {
     #[clap(long = "ip")]
     ip: String,
-    #[clap(short = "h", long = "host", default_value = "localhost")]
+    #[clap(short = 'h', long = "host", default_value = "localhost")]
     host: String,
-    #[clap(short = "p", long = "port", default_value = "50000")]
+    #[clap(short = 'p', long = "port", default_value = "50000")]
     port: u16,
 }
 

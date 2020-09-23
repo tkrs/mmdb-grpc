@@ -15,13 +15,13 @@ use std::thread;
 #[derive(Clap)]
 #[clap(version = crate_version!(), author = "Takeru Sato <type.in.type@gmail.com>")]
 struct Opts {
-    #[clap(short = "h", long = "host", default_value = "localhost")]
+    #[clap(short = 'h', long = "host", default_value = "localhost")]
     host: String,
-    #[clap(short = "p", long = "port", default_value = "50000")]
+    #[clap(short = 'p', long = "port", default_value = "50000")]
     port: u16,
-    #[clap(short = "f", long = "file", default_value = "/usr/share/GeoIP/GeoLite2-City.mmdb")]
+    #[clap(short = 'f', long = "file", default_value = "/usr/share/GeoIP/GeoLite2-City.mmdb")]
     mmdb_path: String,
-    #[clap(short = "w", long = "workers", default_value = "1")]
+    #[clap(short = 'w', long = "workers", default_value = "1")]
     workers: usize,
     #[clap(long = "slots-per-worker")]
     slots_per_worker: Option<usize>,
