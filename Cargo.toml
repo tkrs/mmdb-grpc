@@ -22,7 +22,7 @@ log = "0.4"
 maxminddb = "0.14"
 protobuf = "2.17"
 signal-hook = "0.1"
-spin = "0.5"
+spin = "0.6"
 cron = "0.6"
 chrono = "0.4"
 
