@@ -493,13 +493,12 @@ dependencies = [
 
 [[package]]
 name = "maxminddb"
-version = "0.15.0"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "912cf8c0da1a673a0e0c6b230a858ea71ccaf3ded184041a1c2172d81c1d54d7"
+checksum = "6836097a15eb5f6a1561ef99dd3712d8dd2044421a582f30ea340c4aac3f62f7"
 dependencies = [
  "log",
  "serde",
- "serde_derive",
 ]
 
 [[package]]
@@ -783,6 +782,9 @@ name = "serde"
 version = "1.0.114"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5317f7588f0a5078ee60ef675ef96735a1442132dc645eb1d12c018620ed8cd3"
+dependencies = [
+ "serde_derive",
+]
 
 [[package]]
 name = "serde_derive"
