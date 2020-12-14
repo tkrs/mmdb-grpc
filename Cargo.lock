@@ -87,6 +87,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
+name = "boringssl-src"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c212e3cd725f096e4de48d4ded0909cb62cb92c1a3420ff0e95edb46390a7736"
+dependencies = [
+ "cmake",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -362,10 +371,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63fac32f9f74fa1fd78215d04b47f134c1ee5a535c237a54d52bf18cf65ac983"
 dependencies = [
  "futures",
- "grpcio-sys",
+ "grpcio-sys 0.6.0",
  "libc",
  "log",
- "parking_lot",
+ "parking_lot 0.10.2",
+ "protobuf",
+]
+
+[[package]]
+name = "grpcio"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9846867f136ecbb87e66c5e96763f67a006e9281a85eb6312976cd451d9ed0c0"
+dependencies = [
+ "futures",
+ "grpcio-sys 0.7.1",
+ "libc",
+ "log",
+ "parking_lot 0.11.1",
  "protobuf",
 ]
 
@@ -380,12 +403,12 @@ dependencies = [
 
 [[package]]
 name = "grpcio-proto"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9fef93b24f475cd2807d322a3355dcfe75fdf70fe43d97fbd7ce73fa434ded87"
+checksum = "0e9011b0e752a80603fc024dfacc4b44cda0c7c3def7f27f88ec39e1368649c2"
 dependencies = [
  "futures",
- "grpcio",
+ "grpcio 0.7.0",
  "protobuf",
  "protobuf-build",
  "walkdir",
@@ -398,6 +421,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "12d4e9309f1151c9ebcd07622858c4a504b6ea6cd2821524fe74ccde8ea830d7"
 dependencies = [
  "bindgen",
+ "cc",
+ "cmake",
+ "libc",
+ "libz-sys",
+ "pkg-config",
+ "walkdir",
+]
+
+[[package]]
+name = "grpcio-sys"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e6ea7ecb083588c8b3446270e95415c14ea856539e41ed3ad0c53614398a13f"
+dependencies = [
+ "bindgen",
+ "boringssl-src",
  "cc",
  "cmake",
  "libc",
@@ -440,6 +479,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "instant"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61124eeebbd69b8190558df225adf7e4caafce0d743919e5d6b19652314ec5ec"
+dependencies = [
+ "cfg-if 1.0.0",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -478,6 +526,15 @@ name = "lock_api"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4da24a77a3d8a6d4862d95f72e6fdb9c09a643ecdb402d754004a557f2bec75"
+dependencies = [
+ "scopeguard",
+]
+
+[[package]]
+name = "lock_api"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd96ffd135b2fd7b973ac026d28085defbe8983df057ced3eb4f2130b0831312"
 dependencies = [
  "scopeguard",
 ]
@@ -526,7 +583,7 @@ dependencies = [
  "crossbeam-channel",
  "env_logger",
  "futures",
- "grpcio",
+ "grpcio 0.6.0",
  "grpcio-proto",
  "log",
  "maxminddb",
@@ -588,8 +645,19 @@ version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3a704eb390aafdc107b0e392f56a82b668e3a71366993b5340f5833fd62505e"
 dependencies = [
- "lock_api",
- "parking_lot_core",
+ "lock_api 0.3.4",
+ "parking_lot_core 0.7.2",
+]
+
+[[package]]
+name = "parking_lot"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d7744ac029df22dca6284efe4e898991d28e3085c706c972bcd7da4a27a15eb"
+dependencies = [
+ "instant",
+ "lock_api 0.4.2",
+ "parking_lot_core 0.8.1",
 ]
 
 [[package]]
@@ -600,6 +668,20 @@ checksum = "d58c7c768d4ba344e3e8d72518ac13e259d7c7ade24167003b8488e10b6740a3"
 dependencies = [
  "cfg-if 0.1.10",
  "cloudabi",
+ "libc",
+ "redox_syscall",
+ "smallvec",
+ "winapi",
+]
+
+[[package]]
+name = "parking_lot_core"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7c6d9b8427445284a09c55be860a15855ab580a417ccad9da88f5a06787ced0"
+dependencies = [
+ "cfg-if 1.0.0",
+ "instant",
  "libc",
  "redox_syscall",
  "smallvec",
