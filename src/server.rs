@@ -7,7 +7,8 @@ use log::{error, info};
 use maxminddb as mmdb;
 use mmdb_grpc::proto::geoip2_grpc;
 use mmdb_grpc::{CityService, HealthService};
-use signal_hook::{iterator::Signals, SIGHUP, SIGINT, SIGTERM};
+use signal_hook::consts::{SIGHUP, SIGINT, SIGTERM};
+use signal_hook::iterator::Signals;
 use spin::RwLock;
 use std::sync::Arc;
 use std::thread;
@@ -105,7 +106,7 @@ fn main() {
 fn terminate_channel() -> Result<Receiver<()>, String> {
     let (sender, receiver) = bounded(0);
 
-    let signals = Signals::new(&[SIGTERM, SIGINT]).map_err(|err| err.to_string())?;
+    let mut signals = Signals::new(&[SIGTERM, SIGINT]).map_err(|err| err.to_string())?;
 
     thread::spawn(move || {
         for _ in signals.forever() {
