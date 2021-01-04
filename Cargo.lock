@@ -523,7 +523,7 @@ dependencies = [
 
 [[package]]
 name = "mmdb-grpc"
-version = "0.5.3"
+version = "0.5.4-alpha.0"
 dependencies = [
  "chrono",
  "clap",
