@@ -23,7 +23,7 @@ maxminddb = "0.17"
 protobuf = "2.18"
 signal-hook = "0.3"
 spin = "0.7"
-cron = "0.7"
+cron = "0.8"
 chrono = "0.4"
 
 [build-dependencies]
