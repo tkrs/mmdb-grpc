@@ -26,6 +26,12 @@ struct Opts {
     workers: usize,
     #[clap(long = "slots-per-worker")]
     slots_per_worker: Option<usize>,
+    #[clap(long = "keepalive-time")]
+    keepalive_time: Option<String>,
+    #[clap(long = "keepalive-timeout")]
+    keepalive_timeout: Option<String>,
+    #[clap(long = "keepalive-permit-without-calls")]
+    keepalive_permit_without_calls: Option<bool>,
 }
 
 impl Opts {
@@ -56,15 +62,21 @@ fn main() {
         .register_service(health_service)
         .bind(opts.host(), opts.port);
 
-    let args = ChannelBuilder::new(env)
-        // .keepalive_time(Duration::from_secs(10))
-        // .keepalive_timeout(Duration::from_secs(5))
-        // .keepalive_permit_without_calls(true)
-        // .http2_max_pings_without_data(0)
-        // .http2_min_recv_ping_interval_without_data(Duration::from_secs(5))
-        .build_args();
+    let mut channel_builder = ChannelBuilder::new(env);
 
-    builder = builder.channel_args(args);
+    if let Some(ref v) = opts.keepalive_time {
+        let t = parse_duration::parse(v.as_str()).unwrap();
+        channel_builder = channel_builder.keepalive_time(t);
+    }
+    if let Some(ref v) = opts.keepalive_timeout {
+        let t = parse_duration::parse(v.as_str()).unwrap();
+        channel_builder = channel_builder.keepalive_timeout(t);
+    }
+    if let Some(v) = opts.keepalive_permit_without_calls {
+        channel_builder = channel_builder.keepalive_permit_without_calls(v)
+    }
+
+    builder = builder.channel_args(channel_builder.build_args());
 
     if let Some(v) = opts.slots_per_worker {
         builder = builder.requests_slot_per_cq(v);
