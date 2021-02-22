@@ -25,12 +25,16 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -h, --host <host>                         [default: localhost]
-    -f, --file <mmdb-path>                    [default: /usr/share/GeoIP/GeoLite2-City.mmdb]
-    -p, --port <port>                         [default: 50000]
-        --slots-per-worker <slots-per-cq>    
-    -w, --workers <workers>                   [default: 1]
+    -h, --host <host>                                                        [default: localhost]
+        --keepalive-permit-without-calls <keepalive-permit-without-calls>
+        --keepalive-time <keepalive-time>
+        --keepalive-timeout <keepalive-timeout>
+    -f, --file <mmdb-path>
+            [default: /usr/share/GeoIP/GeoLite2-City.mmdb]
 
+    -p, --port <port>                                                        [default: 50000]
+        --slots-per-worker <slots-per-worker>
+    -w, --workers <workers>                                                  [default: 1]
 ```
 
 ```
@@ -48,5 +52,5 @@ FLAGS:
 OPTIONS:
     -h, --host <host>             [default: localhost]
     -p, --port <port>             [default: 50000]
-    -s, --schedule <schedule>    
+    -s, --schedule <schedule>
 ```
