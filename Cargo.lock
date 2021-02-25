@@ -329,7 +329,7 @@ dependencies = [
  "futures",
  "grpcio",
  "protobuf",
- "protobuf-build",
+ "protobuf-build 0.11.4",
  "walkdir",
 ]
 
@@ -482,7 +482,7 @@ dependencies = [
  "maxminddb",
  "parse_duration",
  "protobuf",
- "protobuf-build",
+ "protobuf-build 0.12.0",
  "signal-hook",
  "spin",
 ]
@@ -707,6 +707,15 @@ dependencies = [
  "protobuf",
  "protobuf-codegen",
  "regex",
+]
+
+[[package]]
+name = "protobuf-build"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "539f2589cd0892cfc07ae25f6e0d2b43440f66b10839e881698f113be28353b2"
+dependencies = [
+ "bitflags",
 ]
 
 [[package]]
