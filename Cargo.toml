@@ -23,7 +23,7 @@ maxminddb = "0.17"
 protobuf = "2.18"
 signal-hook = "0.3"
 spin = "0.7"
-cron = "0.8"
+cron = "0.9"
 chrono = "0.4"
 parse_duration = "2.1"
 
