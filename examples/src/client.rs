@@ -1,12 +1,12 @@
-use clap::Clap;
+use clap::Parser;
 use grpcio::{ChannelBuilder, EnvBuilder};
 use log::{error, info};
 use mmdb_grpc::proto::geoip2::*;
 use mmdb_grpc::proto::geoip2_grpc::GeoIpClient;
 use std::sync::Arc;
 
-#[derive(Clap)]
-#[clap(version = "0.1", author = "Takeru Sato <type.in.type@gmail.com>")]
+#[derive(Parser)]
+#[clap(version, author)]
 struct Opts {
     #[clap(long = "ip")]
     ip: String,

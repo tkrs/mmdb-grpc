@@ -1,5 +1,5 @@
 use chrono::{NaiveDateTime, Utc};
-use clap::{crate_version, Clap};
+use clap::Parser;
 use cron::Schedule;
 use grpcio::{ChannelBuilder, EnvBuilder, Error};
 use log::{debug, info};
@@ -10,8 +10,8 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-#[derive(Clap)]
-#[clap(version = crate_version!(), author = "Takeru Sato <type.in.type@gmail.com>")]
+#[derive(Parser, Debug)]
+#[clap(version, author)]
 struct Opts {
     #[clap(short = 'h', long = "host", default_value = "localhost")]
     host: String,

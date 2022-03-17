@@ -12,23 +12,23 @@ license = "MIT"
 keywords = ["maxmind", "geoip"]
 
 [dependencies]
-clap = "3.0.0-beta.2"
+clap = { version = "3.1.6", features = ["derive"] }
 crossbeam-channel = "0.5"
-env_logger = "0.8"
+env_logger = "0.9"
 futures = "0.3"
-grpcio = "0.7"
-grpcio-proto = "0.7"
+grpcio = "0.10"
+grpcio-proto = "0.10"
 log = "0.4"
-maxminddb = "0.17"
+maxminddb = "0.21"
 protobuf = "2.18"
 signal-hook = "0.3"
-spin = "0.7"
-cron = "0.8"
+spin = "0.9"
+cron = "0.9"
 chrono = "0.4"
-parse_duration = "2.1"
+parse_duration = "2"
 
 [build-dependencies]
-protobuf-build = { version = "0.11", default-features = false }
+protobuf-build = { version = "0.13", default-features = false }
 
 [[bin]]
 name = "mmdb-server"
