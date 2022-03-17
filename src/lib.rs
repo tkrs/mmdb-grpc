@@ -39,9 +39,9 @@ where
         let result = ip
             .parse()
             .map_err(|_| {
-                RpcStatus::new(
+                RpcStatus::with_message(
                     RpcStatusCode::INVALID_ARGUMENT,
-                    Some(format!("The request must be IP address but given '{}'", ip)),
+                    format!("The request must be IP address but given '{}'", ip),
                 )
             })
             .and_then(|ip| {
@@ -301,11 +301,11 @@ impl From<geoip2::model::Traits> for Traits {
 
 fn convert_error(err: MaxMindDBError) -> RpcStatus {
     match err {
-        MaxMindDBError::AddressNotFoundError(msg) => RpcStatus::new(RpcStatusCode::NOT_FOUND, msg.into()),
-        MaxMindDBError::InvalidDatabaseError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
-        MaxMindDBError::IoError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
-        MaxMindDBError::MapError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
-        MaxMindDBError::DecodingError(msg) => RpcStatus::new(RpcStatusCode::INTERNAL, msg.into()),
+        MaxMindDBError::AddressNotFoundError(msg) => RpcStatus::with_message(RpcStatusCode::NOT_FOUND, msg),
+        MaxMindDBError::InvalidDatabaseError(msg) => RpcStatus::with_message(RpcStatusCode::INTERNAL, msg),
+        MaxMindDBError::IoError(msg) => RpcStatus::with_message(RpcStatusCode::INTERNAL, msg),
+        MaxMindDBError::MapError(msg) => RpcStatus::with_message(RpcStatusCode::INTERNAL, msg),
+        MaxMindDBError::DecodingError(msg) => RpcStatus::with_message(RpcStatusCode::INTERNAL, msg),
     }
 }
 

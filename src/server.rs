@@ -1,4 +1,4 @@
-use clap::{crate_version, Clap};
+use clap::Parser;
 use crossbeam_channel::{bounded, select, Receiver};
 use futures::executor::block_on;
 use grpcio::{ChannelBuilder, Environment, ServerBuilder};
@@ -13,8 +13,8 @@ use spin::RwLock;
 use std::sync::Arc;
 use std::thread;
 
-#[derive(Clap)]
-#[clap(version = crate_version!(), author = "Takeru Sato <type.in.type@gmail.com>")]
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
 struct Opts {
     #[clap(short = 'h', long = "host", default_value = "localhost")]
     host: String,
