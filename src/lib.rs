@@ -164,7 +164,7 @@ impl<'a> From<WrappedCity<'a>> for CityReply {
     }
 }
 
-struct MCity<'a>(geoip2::model::City<'a>, &'a HashSet<String>);
+struct MCity<'a>(geoip2::city::City<'a>, &'a HashSet<String>);
 
 impl<'a> From<MCity<'a>> for City {
     fn from(c: MCity) -> City {
@@ -179,7 +179,7 @@ impl<'a> From<MCity<'a>> for City {
     }
 }
 
-struct MContinent<'a>(geoip2::model::Continent<'a>, &'a HashSet<String>);
+struct MContinent<'a>(geoip2::city::Continent<'a>, &'a HashSet<String>);
 
 impl<'a> From<MContinent<'a>> for Continent {
     fn from(c: MContinent) -> Continent {
@@ -197,7 +197,7 @@ impl<'a> From<MContinent<'a>> for Continent {
     }
 }
 
-struct MCountry<'a>(geoip2::model::Country<'a>, &'a HashSet<String>);
+struct MCountry<'a>(geoip2::city::Country<'a>, &'a HashSet<String>);
 
 impl<'a> From<MCountry<'a>> for Country {
     fn from(c: MCountry) -> Country {
@@ -218,8 +218,8 @@ impl<'a> From<MCountry<'a>> for Country {
     }
 }
 
-impl<'a> From<geoip2::model::Location<'a>> for Location {
-    fn from(c: geoip2::model::Location) -> Location {
+impl<'a> From<geoip2::city::Location<'a>> for Location {
+    fn from(c: geoip2::city::Location) -> Location {
         let mut r = Location::default();
         if let Some(a) = c.latitude {
             r.set_latitude(a);
@@ -237,8 +237,8 @@ impl<'a> From<geoip2::model::Location<'a>> for Location {
     }
 }
 
-impl<'a> From<geoip2::model::Postal<'a>> for Postal {
-    fn from(c: geoip2::model::Postal) -> Postal {
+impl<'a> From<geoip2::city::Postal<'a>> for Postal {
+    fn from(c: geoip2::city::Postal) -> Postal {
         let mut r = Postal::default();
         if let Some(a) = c.code {
             r.set_code(a.to_string());
@@ -247,7 +247,7 @@ impl<'a> From<geoip2::model::Postal<'a>> for Postal {
     }
 }
 
-struct MRepresentedCountry<'a>(geoip2::model::RepresentedCountry<'a>, &'a HashSet<String>);
+struct MRepresentedCountry<'a>(geoip2::city::RepresentedCountry<'a>, &'a HashSet<String>);
 
 impl<'a> From<MRepresentedCountry<'a>> for RepresentedCountry {
     fn from(c: MRepresentedCountry) -> RepresentedCountry {
@@ -268,8 +268,8 @@ impl<'a> From<MRepresentedCountry<'a>> for RepresentedCountry {
 #[derive(PartialEq, Clone, Default)]
 struct Subdivisions(Vec<Subdivision>);
 
-impl<'a> From<Vec<geoip2::model::Subdivision<'a>>> for Subdivisions {
-    fn from(vs: Vec<geoip2::model::Subdivision>) -> Subdivisions {
+impl<'a> From<Vec<geoip2::city::Subdivision<'a>>> for Subdivisions {
+    fn from(vs: Vec<geoip2::city::Subdivision>) -> Subdivisions {
         let mut subs = Vec::with_capacity(vs.len());
 
         for s in vs {
@@ -286,8 +286,8 @@ impl<'a> From<Vec<geoip2::model::Subdivision<'a>>> for Subdivisions {
     }
 }
 
-impl From<geoip2::model::Traits> for Traits {
-    fn from(c: geoip2::model::Traits) -> Traits {
+impl From<geoip2::city::Traits> for Traits {
+    fn from(c: geoip2::city::Traits) -> Traits {
         let mut t = Traits::default();
         if let Some(v) = c.is_anonymous_proxy {
             t.is_anonymous_proxy = v;
@@ -302,6 +302,7 @@ impl From<geoip2::model::Traits> for Traits {
 fn convert_error(err: MaxMindDBError) -> RpcStatus {
     match err {
         MaxMindDBError::AddressNotFoundError(msg) => RpcStatus::with_message(RpcStatusCode::NOT_FOUND, msg),
+        MaxMindDBError::InvalidNetworkError(msg) => RpcStatus::with_message(RpcStatusCode::INTERNAL, msg),
         MaxMindDBError::InvalidDatabaseError(msg) => RpcStatus::with_message(RpcStatusCode::INTERNAL, msg),
         MaxMindDBError::IoError(msg) => RpcStatus::with_message(RpcStatusCode::INTERNAL, msg),
         MaxMindDBError::MapError(msg) => RpcStatus::with_message(RpcStatusCode::INTERNAL, msg),
