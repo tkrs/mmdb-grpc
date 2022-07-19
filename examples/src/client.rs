@@ -8,11 +8,11 @@ use std::sync::Arc;
 #[derive(Parser)]
 #[clap(version, author)]
 struct Opts {
-    #[clap(long = "ip")]
+    #[clap(long = "ip", value_parser)]
     ip: String,
-    #[clap(short = 'h', long = "host", default_value = "localhost")]
+    #[clap(short = 'h', long = "host", value_parser, default_value = "localhost")]
     host: String,
-    #[clap(short = 'p', long = "port", default_value = "50000")]
+    #[clap(short = 'p', long = "port", value_parser, default_value = "50000")]
     port: u16,
 }
 
