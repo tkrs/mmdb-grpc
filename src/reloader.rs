@@ -13,11 +13,11 @@ use std::time::Duration;
 #[derive(Parser, Debug)]
 #[clap(version, author)]
 struct Opts {
-    #[clap(short = 'h', long = "host", default_value = "localhost")]
+    #[clap(short = 'h', long = "host", value_parser, default_value = "localhost")]
     host: String,
-    #[clap(short = 'p', long = "port", default_value = "50000")]
+    #[clap(short = 'p', long = "port", value_parser, default_value = "50000")]
     port: u16,
-    #[clap(short = 's', long = "schedule")]
+    #[clap(short = 's', long = "schedule", value_parser)]
     schedule: Option<String>,
 }
 

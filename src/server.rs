@@ -16,21 +16,26 @@ use std::thread;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Opts {
-    #[clap(short = 'h', long = "host", default_value = "localhost")]
+    #[clap(short = 'h', long = "host", value_parser, default_value = "localhost")]
     host: String,
-    #[clap(short = 'p', long = "port", default_value = "50000")]
+    #[clap(short = 'p', long = "port", value_parser, default_value = "50000")]
     port: u16,
-    #[clap(short = 'f', long = "file", default_value = "/usr/share/GeoIP/GeoLite2-City.mmdb")]
+    #[clap(
+        short = 'f',
+        long = "file",
+        value_parser,
+        default_value = "/usr/share/GeoIP/GeoLite2-City.mmdb"
+    )]
     mmdb_path: String,
-    #[clap(short = 'w', long = "workers", default_value = "1")]
+    #[clap(short = 'w', long = "workers", value_parser, default_value = "1")]
     workers: usize,
-    #[clap(long = "slots-per-worker")]
+    #[clap(long = "slots-per-worker", value_parser)]
     slots_per_worker: Option<usize>,
-    #[clap(long = "keepalive-time")]
+    #[clap(long = "keepalive-time", value_parser)]
     keepalive_time: Option<String>,
-    #[clap(long = "keepalive-timeout")]
+    #[clap(long = "keepalive-timeout", value_parser)]
     keepalive_timeout: Option<String>,
-    #[clap(long = "keepalive-permit-without-calls")]
+    #[clap(long = "keepalive-permit-without-calls", value_parser)]
     keepalive_permit_without_calls: Option<bool>,
 }
 
