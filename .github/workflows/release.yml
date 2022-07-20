@@ -77,7 +77,7 @@ jobs:
             echo ::set-output name=VERSION::${v}
           fi
       - name: mmdb-server push to GitHub Container Registry
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -85,7 +85,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/mmdb-server:${{ steps.get_version.outputs.VERSION }}
           push: true
       - name: mmdb-reload push to GitHub Container Registry
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -93,7 +93,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/mmdb-reload:${{ steps.get_version.outputs.VERSION }}
           push: true
       - name: mmdb-server push to Docker Hub
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -101,7 +101,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USER }}/mmdb-server:${{ steps.get_version.outputs.VERSION }}
           push: true
       - name: mmdb-reload push to Docker Hub
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
