@@ -1,6 +1,6 @@
 [package]
 name = "mmdb-grpc"
-version = "0.5.5-alpha.0"
+version = "0.5.5"
 authors = ["Takeru Sato <type.in.type@gmail.com>"]
 edition = "2018"
 description = "The gRPC service that provides a query to Maxmind's GeoLite2 databases"
