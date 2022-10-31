@@ -9,7 +9,7 @@ on:
 
 jobs:
   build_and_publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@master
       - run: git submodule update --init --recursive
