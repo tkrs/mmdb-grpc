@@ -10,7 +10,7 @@ fn main() {
     fs::create_dir_all(&proto_out).unwrap();
     protobuf_build::Builder::new()
         .includes(&[proto_root.to_owned()])
-        .files(&[&*geoip2_proto])
+        .files(&[geoip2_proto])
         .out_dir(proto_out.as_path().display().to_string())
         .generate();
     println!("cargo:rerun-if-changed={}", proto_root);
