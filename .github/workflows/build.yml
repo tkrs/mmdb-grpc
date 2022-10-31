@@ -14,7 +14,7 @@ jobs:
           - stable
           - nightly
     name: Test and Build - ${{ matrix.version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@master
       - run: git submodule update --init --recursive
@@ -59,7 +59,7 @@ jobs:
           args: --workspace --verbose
   lints:
     name: Clippy and Rustfmt
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@master
       - run: git submodule update --init --recursive

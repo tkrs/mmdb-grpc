@@ -1,4 +1,4 @@
-FROM debian:buster-slim as builder
+FROM ubuntu:22.04 as builder
 
 WORKDIR /tmp
 
@@ -7,7 +7,7 @@ RUN apt-get -qq update && apt-get -qq install -y curl
 RUN curl -L -o grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.2/grpc_health_probe-linux-amd64 && \
   chmod +x grpc_health_probe
 
-FROM debian:buster-slim
+FROM ubuntu:22.04
 
 ENV RUST_LOG=info
 ENV RUST_BACKTRACE=1
