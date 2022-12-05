@@ -14,7 +14,7 @@ keywords = ["maxmind", "geoip"]
 [dependencies]
 clap = { version = "3.2.2", features = ["derive"] }
 crossbeam-channel = "0.5"
-env_logger = "0.9"
+env_logger = "0.10"
 futures = "0.3"
 grpcio = "0.10"
 grpcio-proto = "0.10"
