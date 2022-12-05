@@ -123,7 +123,7 @@ fn main() {
 fn terminate_channel() -> Result<Receiver<()>, String> {
     let (sender, receiver) = bounded(0);
 
-    let mut signals = Signals::new(&[SIGTERM, SIGINT]).map_err(|err| err.to_string())?;
+    let mut signals = Signals::new([SIGTERM, SIGINT]).map_err(|err| err.to_string())?;
 
     thread::spawn(move || {
         for _ in signals.forever() {
@@ -137,7 +137,7 @@ fn terminate_channel() -> Result<Receiver<()>, String> {
 fn reload_channel() -> Result<Receiver<()>, String> {
     let (sender, receiver) = bounded(0);
 
-    let mut signals = Signals::new(&[SIGHUP]).map_err(|err| err.to_string())?;
+    let mut signals = Signals::new([SIGHUP]).map_err(|err| err.to_string())?;
 
     thread::spawn(move || loop {
         for _ in signals.wait() {
