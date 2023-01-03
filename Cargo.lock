@@ -937,9 +937,9 @@ dependencies = [
 
 [[package]]
 name = "protobuf-build"
-version = "0.13.0"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b2be70fa994657539e3c872cc54363c9bf28b0d7a7f774df70e9fd760df3bc4"
+checksum = "6fb3c02f54ecaf12572c1a60dbdb36b1f8f713a16105881143f2be84cca5bbe3"
 dependencies = [
  "bitflags",
  "grpcio-compiler",

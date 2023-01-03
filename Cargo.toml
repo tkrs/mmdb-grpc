@@ -28,7 +28,7 @@ chrono = "0.4"
 parse_duration = "2"
 
 [build-dependencies]
-protobuf-build = { version = "0.13", default-features = false }
+protobuf-build = { version = "0.14", default-features = false }
 
 [[bin]]
 name = "mmdb-server"
