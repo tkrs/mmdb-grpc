@@ -74,7 +74,7 @@ jobs:
           if [[ "$v" == "master" ]]; then
             echo "VERSION=latest" >$GITHUB_OUTPUT
           else
-            echo "VERSION=${v}"" >$GITHUB_OUTPUT
+            echo "VERSION=${v}" >$GITHUB_OUTPUT
           fi
       - name: mmdb-server push to GitHub Container Registry
         uses: docker/build-push-action@v4
