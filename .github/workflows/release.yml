@@ -69,12 +69,12 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
       - name: Get the version
         id: get_version
-        run: |	
+        run: |
           v="${GITHUB_REF##*/}"
           if [[ "$v" == "master" ]]; then
-            echo ::set-output name=VERSION::latest
+            echo "VERSION=latest" >$GITHUB_OUTPUT
           else
-            echo ::set-output name=VERSION::${v}
+            echo "VERSION=${v}"" >$GITHUB_OUTPUT
           fi
       - name: mmdb-server push to GitHub Container Registry
         uses: docker/build-push-action@v4
