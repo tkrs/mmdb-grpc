@@ -446,9 +446,9 @@ checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
 name = "grpcio"
-version = "0.10.4"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f2506de56197d01821c2d1d21082d2dcfd6c82d7a1d6e04d33f37aab6130632"
+checksum = "1132252c65fd51bd7d1dc7920e2931201fc3a2c9e3fbce6c27f8762e7a2ff3ed"
 dependencies = [
  "futures-executor",
  "futures-util",
@@ -470,9 +470,9 @@ dependencies = [
 
 [[package]]
 name = "grpcio-proto"
-version = "0.10.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a450c8543bbbc6483f85015d9d69807456779e4ff610c32e540481f3f47cfca3"
+checksum = "ea7be97c0095e52969689d67bc0914fb23bf3bcac16846cbdc5ac78c65899b61"
 dependencies = [
  "grpcio",
  "protobuf",
