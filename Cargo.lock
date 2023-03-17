@@ -452,10 +452,25 @@ checksum = "1132252c65fd51bd7d1dc7920e2931201fc3a2c9e3fbce6c27f8762e7a2ff3ed"
 dependencies = [
  "futures-executor",
  "futures-util",
- "grpcio-sys",
+ "grpcio-sys 0.10.3+1.44.0-patched",
  "libc",
  "log",
- "parking_lot",
+ "parking_lot 0.11.2",
+ "protobuf",
+]
+
+[[package]]
+name = "grpcio"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "609832ca501baeb662dc81932fda9ed83f5d058f4b899a807ba222ce696f430a"
+dependencies = [
+ "futures-executor",
+ "futures-util",
+ "grpcio-sys 0.12.1+1.46.5-patched",
+ "libc",
+ "log",
+ "parking_lot 0.12.1",
  "protobuf",
 ]
 
@@ -474,7 +489,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea7be97c0095e52969689d67bc0914fb23bf3bcac16846cbdc5ac78c65899b61"
 dependencies = [
- "grpcio",
+ "grpcio 0.11.0",
  "protobuf",
  "protobuf-build",
  "walkdir",
@@ -485,6 +500,22 @@ name = "grpcio-sys"
 version = "0.10.3+1.44.0-patched"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f23adc509a3c4dea990e0ab8d2add4a65389ee69c288b7851d75dd1df7a6d6c6"
+dependencies = [
+ "bindgen",
+ "boringssl-src",
+ "cc",
+ "cmake",
+ "libc",
+ "libz-sys",
+ "pkg-config",
+ "walkdir",
+]
+
+[[package]]
+name = "grpcio-sys"
+version = "0.12.1+1.46.5-patched"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf625d1803b6f44203f0428ddace847fb4994def5c803fc8a7a2f18fb3daec62"
 dependencies = [
  "bindgen",
  "boringssl-src",
@@ -721,7 +752,7 @@ dependencies = [
  "crossbeam-channel",
  "env_logger 0.10.0",
  "futures",
- "grpcio",
+ "grpcio 0.12.1",
  "grpcio-proto",
  "log",
  "maxminddb",
@@ -839,7 +870,17 @@ checksum = "7d17b78036a60663b797adeaee46f5c9dfebb86948d1255007a1d6be0271ff99"
 dependencies = [
  "instant",
  "lock_api",
- "parking_lot_core",
+ "parking_lot_core 0.8.6",
+]
+
+[[package]]
+name = "parking_lot"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3742b2c103b9f06bc9fff0a37ff4912935851bee6d36f3c02bcc755bcfec228f"
+dependencies = [
+ "lock_api",
+ "parking_lot_core 0.9.7",
 ]
 
 [[package]]
@@ -854,6 +895,19 @@ dependencies = [
  "redox_syscall",
  "smallvec",
  "winapi",
+]
+
+[[package]]
+name = "parking_lot_core"
+version = "0.9.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9069cbb9f99e3a5083476ccb29ceb1de18b9118cafa53e90c9551235de2b9521"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "redox_syscall",
+ "smallvec",
+ "windows-sys",
 ]
 
 [[package]]
