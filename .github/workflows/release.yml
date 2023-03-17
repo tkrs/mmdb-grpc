@@ -1,89 +1,41 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - 'master'
-    tags:
-      - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
-  build_and_publish:
-    runs-on: ubuntu-22.04
+  release-crate:
+    environment: production
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - run: git submodule update --init --recursive
-      - name: Install stable
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v3
+      - uses: chainguard-dev/actions/setup-gitsign@main
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+      - run: sudo npm install -g standard-version
+      - name: Determine tag and generate release body
+        run: standard-version --infile RELEASE_BODY.md --skip.commit
+      - name: Generate release context
+        id: release_context
+        run: |
+          tag="$(git describe HEAD --abbrev=0)"
+          echo "tag_name=$tag" >>$GITHUB_OUTPUT
+          echo "version=${tag/v/}" >>$GITHUB_OUTPUT
+          git tag -d "${tag}"
+      - name: Install cargo-release
+        uses: taiki-e/install-action@v1
         with:
-          toolchain: stable-x86_64-unknown-linux-gnu
-          override: true
-      - name: Install sccache
+          tool: cargo-release
+      - run: cargo release ${{ steps.release_context.outputs.version }} --execute
         env:
-          SCCACHE_LINK: https://github.com/mozilla/sccache/releases/download
-          SCCACHE_VERSION: 0.2.13
-        run: |
-          curl -L "$SCCACHE_LINK/$SCCACHE_VERSION/sccache-$SCCACHE_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xz
-          echo "$PWD/sccache-$SCCACHE_VERSION-x86_64-unknown-linux-musl/" >> $GITHUB_PATH
-          echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
-      - name: cache sccache files
-        uses: actions/cache@v3.2.2
+          CARGO_REGISTRY_TOKEN: secrets.CARGO_REGISTRY_TOKEN
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          path: ~/.cache/sccache
-          key: release-stable-sccache-0213-cache-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            release-stable-sccache-0213-cache-
-      - name: show sccache stats
-        run: sccache --show-stats
-      - name: checks
-        uses: actions-rs/cargo@v1
-        if: github.ref == 'refs/heads/master'
-        with:
-          command: check
-          args: --tests --workspace --release --verbose
-      - name: tests
-        if: github.ref == 'refs/heads/master'
-        uses: actions-rs/cargo@v1
-        timeout-minutes: 20
-        with:
-          command: test
-          args: --workspace --release --verbose --no-fail-fast -- --nocapture
-      - name: builds
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --workspace --release --verbose
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_TOKEN }}
-      - name: Get the version
-        id: get_version
-        run: |
-          v="${GITHUB_REF##*/}"
-          if [[ "$v" == "master" ]]; then
-            echo "VERSION=latest" >$GITHUB_OUTPUT
-          else
-            echo "VERSION=${v}" >$GITHUB_OUTPUT
-          fi
-      - name: mmdb-server push to GitHub Container Registry
-        uses: docker/build-push-action@v4
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: .
-          file: docker/server/Dockerfile
-          tags: ghcr.io/${{ github.repository_owner }}/mmdb-server:${{ steps.get_version.outputs.VERSION }}
-          push: true
-      - name: mmdb-reload push to GitHub Container Registry
-        uses: docker/build-push-action@v4
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: .
-          file: docker/reload/Dockerfile
-          tags: ghcr.io/${{ github.repository_owner }}/mmdb-reload:${{ steps.get_version.outputs.VERSION }}
-          push: true
+          release_name: Release ${{ steps.release_context.outputs.tag_name }}
+          tag_name: ${{ steps.release_context.outputs.tag_name }}
+          body_path: RELEASE_BODY.md
