@@ -4,7 +4,7 @@ use crate::proto::geoip2::*;
 use crate::proto::geoip2_grpc::*;
 use futures::prelude::*;
 use grpcio::{RpcContext, RpcStatus, RpcStatusCode, UnarySink};
-use grpcio_proto::health::v1::health::*;
+use grpcio_health::proto::*;
 use log::{debug, error};
 use maxminddb::{self, geoip2, MaxMindDBError, Metadata};
 use spin::RwLock;
@@ -353,7 +353,7 @@ impl Health for HealthService {
     fn check(&mut self, ctx: RpcContext<'_>, req: HealthCheckRequest, sink: UnarySink<HealthCheckResponse>) {
         debug!("check the service: {}", req.get_service());
         let mut resp = HealthCheckResponse::default();
-        resp.set_status(HealthCheckResponse_ServingStatus::SERVING);
+        resp.set_status(ServingStatus::Serving);
         ctx.spawn(
             sink.success(resp)
                 .map_err(|e| error!("failed to report result: {:?}", e))
