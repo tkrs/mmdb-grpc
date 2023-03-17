@@ -1,8 +1,8 @@
 use clap::Parser;
 use crossbeam_channel::{bounded, select, Receiver};
 use futures::executor::block_on;
-use grpcio::{ChannelBuilder, Environment, ServerBuilder};
-use grpcio_proto::health::v1::health::*;
+use grpcio::{ChannelBuilder, Environment, ServerBuilder, ServerCredentials};
+use grpcio_health::proto::*;
 use log::{error, info};
 use maxminddb as mmdb;
 use mmdb_grpc::proto::geoip2_grpc;
@@ -52,6 +52,7 @@ fn main() {
     env_logger::init();
 
     let opts = Opts::parse();
+    let addr = format!("{}:{}", opts.host().as_str(), opts.port);
 
     let reader = mmdb::Reader::open_readfile(opts.mmdb_path()).unwrap();
     let mmdb = Arc::new(RwLock::new(reader));
@@ -62,13 +63,8 @@ fn main() {
         mmdb::Reader::open_readfile(cloned_path.clone())
     }));
     let health_service = create_health(HealthService);
-    let mut builder = ServerBuilder::new(env.clone())
-        .register_service(geoip_service)
-        .register_service(health_service)
-        .bind(opts.host(), opts.port);
 
-    let mut channel_builder = ChannelBuilder::new(env);
-
+    let mut channel_builder = ChannelBuilder::new(env.clone());
     if let Some(ref v) = opts.keepalive_time {
         let t = parse_duration::parse(v.as_str()).unwrap();
         channel_builder = channel_builder.keepalive_time(t);
@@ -81,17 +77,22 @@ fn main() {
         channel_builder = channel_builder.keepalive_permit_without_calls(v)
     }
 
-    builder = builder.channel_args(channel_builder.build_args());
+    let mut builder = ServerBuilder::new(env)
+        .register_service(geoip_service)
+        .register_service(health_service)
+        .channel_args(channel_builder.build_args());
 
     if let Some(v) = opts.slots_per_worker {
         builder = builder.requests_slot_per_cq(v);
     }
 
     let mut server = builder.build().unwrap();
+    server
+        .add_listening_port(addr.as_str(), ServerCredentials::insecure())
+        .unwrap();
     server.start();
 
-    let (h, p) = server.bind_addrs().next().unwrap();
-    info!("started mmdb-grpc server listening on {}:{}", h, p);
+    info!("started mmdb-grpc server listening on {}", addr);
 
     let mmdb_path = opts.mmdb_path();
     let term_event = terminate_channel().unwrap();
