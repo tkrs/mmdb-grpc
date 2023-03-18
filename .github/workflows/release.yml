@@ -12,11 +12,16 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
-      - run: git submodule update --init --recursive
       - name: Setup git user
         run: |
           git config --global user.email "type.in.type@gmail.com"
           git config --global user.name "Takeru Sato"
+      - run: git submodule update --init --recursive
+      - name: Install rust toolchain stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable-x86_64-unknown-linux-gnu
+          override: true
       - name: Setup Node.js
         uses: actions/setup-node@v3
       - run: sudo npm install -g standard-version
