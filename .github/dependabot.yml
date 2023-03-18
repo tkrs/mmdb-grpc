@@ -2,6 +2,8 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
+    commit-message:
+      prefix: ci(deps)
     schedule:
       interval: "weekly"
   - package-ecosystem: "cargo"
@@ -10,5 +12,7 @@ updates:
       interval: "weekly"
   - package-ecosystem: "docker"
     directory: "/"
+    commit-message:
+      prefix: build(docker)
     schedule:
       interval: "weekly"
