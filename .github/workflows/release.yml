@@ -12,6 +12,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
+      - run: git submodule update --init --recursive
       - name: Setup git user
         run: |
           git config --global user.email "type.in.type@gmail.com"
