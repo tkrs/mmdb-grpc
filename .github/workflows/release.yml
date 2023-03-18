@@ -6,15 +6,12 @@ on:
 jobs:
   release-crate:
     environment: production
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
-      - uses: chainguard-dev/actions/setup-gitsign@main
       - name: Setup Node.js
         uses: actions/setup-node@v3
       - run: sudo npm install -g standard-version
