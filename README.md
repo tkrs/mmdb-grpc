@@ -1,8 +1,8 @@
 # mmdb-grpc
 
-[![crates.io](https://meritbadge.herokuapp.com/mmdb-grpc)](https://crates.io/crates/mmdb-grpc)
-![](https://github.com/tkrs/mmdb-grpc/workflows/Build/badge.svg)
-![](https://github.com/tkrs/mmdb-grpc/workflows/Release/badge.svg)
+[![crates.io](https://img.shields.io/crates/v/mmdb-grpc)](https://crates.io/crates/mmdb-grpc)
+[![Build](https://github.com/tkrs/mmdb-grpc/workflows/Build/badge.svg)](https://github.com/tkrs/mmdb-grpc/actions/workflows/build.yml)
+[![Release](https://github.com/tkrs/mmdb-grpc/workflows/Release/badge.svg)](https://github.com/tkrs/mmdb-grpc/actions/workflows/release.yml)
 
 The gRPC service that provides a query to [maxminddb](https://docs.rs/crate/maxminddb/)
 
