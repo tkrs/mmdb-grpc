@@ -20,7 +20,7 @@ jobs:
       - name: Install rust toolchain stable
         uses: dtolnay/rust-toolchain@v1
         with:
-          toolchain: ${{ matrix.version }}
+          toolchain: stable
           target: x86_64-unknown-linux-gnu
       - name: Setup Node.js
         uses: actions/setup-node@v3
