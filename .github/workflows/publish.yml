@@ -23,7 +23,8 @@ jobs:
         with:
           cache-directories: ~/.cache/sccache
       - uses: mozilla-actions/sccache-action@v0.0.3
-      - run: |
+      - name: Setup sccache
+        run: |
           echo "SCCACHE_GHA_ENABLED=true" >>$GITHUB_ENV
           echo "RUSTC_WRAPPER=sccache" >>$GITHUB_ENV
       - run: cargo check --tests --workspace --release --verbose
