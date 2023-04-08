@@ -5,23 +5,23 @@ on:
 
 jobs:
   release-crate:
-    environment: production
+    environment: crates-io
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
+          submodules: true
       - name: Setup git user
         run: |
           git config --global user.email "type.in.type@gmail.com"
           git config --global user.name "Takeru Sato"
-      - run: git submodule update --init --recursive
       - name: Install rust toolchain stable
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@v1
         with:
-          toolchain: stable-x86_64-unknown-linux-gnu
-          override: true
+          toolchain: ${{ matrix.version }}
+          target: x86_64-unknown-linux-gnu
       - name: Setup Node.js
         uses: actions/setup-node@v3
       - run: sudo npm install -g standard-version
