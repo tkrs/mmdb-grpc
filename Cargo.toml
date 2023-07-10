@@ -12,7 +12,7 @@ license = "MIT"
 keywords = ["maxmind", "geoip"]
 
 [dependencies]
-clap = { version = "4.3.2", features = ["derive"] }
+clap = { version = "4.3.11", features = ["derive"] }
 crossbeam-channel = "0.5"
 env_logger = "0.10"
 futures = "0.3"
