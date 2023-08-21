@@ -29,7 +29,7 @@ chrono = "0.4"
 parse_duration = "2"
 
 [build-dependencies]
-protobuf-build = { version = "0.14", default-features = false, features = ["grpcio-protobuf-codec"] }
+protobuf-build = { version = "0.15", default-features = false, features = ["grpcio-protobuf-codec"] }
 
 [[bin]]
 name = "mmdb-server"
