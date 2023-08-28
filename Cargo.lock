@@ -149,6 +149,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "boringssl-src"
+version = "0.6.0+e46383f"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5edec42197c014d84ea2396589f0da14b2257f63f319442b5e8475a077b90457"
+dependencies = [
+ "cmake",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -524,7 +533,22 @@ checksum = "609832ca501baeb662dc81932fda9ed83f5d058f4b899a807ba222ce696f430a"
 dependencies = [
  "futures-executor",
  "futures-util",
- "grpcio-sys",
+ "grpcio-sys 0.12.1+1.46.5-patched",
+ "libc",
+ "log",
+ "parking_lot",
+ "protobuf",
+]
+
+[[package]]
+name = "grpcio"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e398946b5721d72478eb647260a1b7c1d5f70f0de35399846c3913bd369a33e"
+dependencies = [
+ "futures-executor",
+ "futures-util",
+ "grpcio-sys 0.13.0+1.56.2-patched",
  "libc",
  "log",
  "parking_lot",
@@ -548,18 +572,18 @@ checksum = "e680f3b3a1a73cdca1cbf5d463ecdc1f03c4e5682bfebf4272e7e8a2217d413d"
 dependencies = [
  "futures-executor",
  "futures-util",
- "grpcio",
+ "grpcio 0.12.1",
  "log",
  "protobuf",
 ]
 
 [[package]]
 name = "grpcio-proto"
-version = "0.12.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee4dadd269eb90582ad3685aa280b9efacdcf41c2826e41a76cda3aae74bca28"
+checksum = "211fb2f094e2b6e768a7e112c3683dc81c102b05a939cc8a594e6a10a5a3ad8c"
 dependencies = [
- "grpcio",
+ "grpcio 0.13.0",
  "protobuf",
  "walkdir",
 ]
@@ -571,7 +595,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf625d1803b6f44203f0428ddace847fb4994def5c803fc8a7a2f18fb3daec62"
 dependencies = [
  "bindgen",
- "boringssl-src",
+ "boringssl-src 0.5.2+6195bf8",
+ "cc",
+ "cmake",
+ "libc",
+ "libz-sys",
+ "pkg-config",
+ "walkdir",
+]
+
+[[package]]
+name = "grpcio-sys"
+version = "0.13.0+1.56.2-patched"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3dae9132320ae1b03ea55b5ddc88ca72a31fb85fa631a241a40157f5feffe43"
+dependencies = [
+ "bindgen",
+ "boringssl-src 0.6.0+e46383f",
  "cc",
  "cmake",
  "libc",
@@ -777,7 +817,7 @@ dependencies = [
  "crossbeam-channel",
  "env_logger 0.10.0",
  "futures",
- "grpcio",
+ "grpcio 0.12.1",
  "grpcio-health",
  "grpcio-proto",
  "log",
