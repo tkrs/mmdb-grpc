@@ -521,7 +521,22 @@ checksum = "609832ca501baeb662dc81932fda9ed83f5d058f4b899a807ba222ce696f430a"
 dependencies = [
  "futures-executor",
  "futures-util",
- "grpcio-sys",
+ "grpcio-sys 0.12.1+1.46.5-patched",
+ "libc",
+ "log",
+ "parking_lot",
+ "protobuf",
+]
+
+[[package]]
+name = "grpcio"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e398946b5721d72478eb647260a1b7c1d5f70f0de35399846c3913bd369a33e"
+dependencies = [
+ "futures-executor",
+ "futures-util",
+ "grpcio-sys 0.13.0+1.56.2-patched",
  "libc",
  "log",
  "parking_lot",
@@ -539,13 +554,13 @@ dependencies = [
 
 [[package]]
 name = "grpcio-health"
-version = "0.12.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e680f3b3a1a73cdca1cbf5d463ecdc1f03c4e5682bfebf4272e7e8a2217d413d"
+checksum = "b10ab95750a1f45c99cc5fc22c6299f0a65c5d73788b5cac5d1d056e4dc249d0"
 dependencies = [
  "futures-executor",
  "futures-util",
- "grpcio",
+ "grpcio 0.13.0",
  "log",
  "protobuf",
 ]
@@ -556,7 +571,7 @@ version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee4dadd269eb90582ad3685aa280b9efacdcf41c2826e41a76cda3aae74bca28"
 dependencies = [
- "grpcio",
+ "grpcio 0.12.1",
  "protobuf",
  "walkdir",
 ]
@@ -569,6 +584,21 @@ checksum = "cf625d1803b6f44203f0428ddace847fb4994def5c803fc8a7a2f18fb3daec62"
 dependencies = [
  "bindgen",
  "boringssl-src",
+ "cc",
+ "cmake",
+ "libc",
+ "libz-sys",
+ "pkg-config",
+ "walkdir",
+]
+
+[[package]]
+name = "grpcio-sys"
+version = "0.13.0+1.56.2-patched"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3dae9132320ae1b03ea55b5ddc88ca72a31fb85fa631a241a40157f5feffe43"
+dependencies = [
+ "bindgen",
  "cc",
  "cmake",
  "libc",
@@ -774,7 +804,7 @@ dependencies = [
  "crossbeam-channel",
  "env_logger 0.10.0",
  "futures",
- "grpcio",
+ "grpcio 0.12.1",
  "grpcio-health",
  "grpcio-proto",
  "log",
