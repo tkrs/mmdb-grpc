@@ -6,6 +6,13 @@ updates:
       prefix: ci(deps)
     schedule:
       interval: "weekly"
+    groups:
+      grpcio:
+        patterns:
+          - "grpcio*"
+      proto:
+        patterns:
+          - "protobuf*"
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
