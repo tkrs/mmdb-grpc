@@ -16,7 +16,7 @@ jobs:
     name: Test and Build - ${{ matrix.version }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Install ${{ matrix.version }}
@@ -43,7 +43,7 @@ jobs:
     name: Clippy and Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Install toolchain and components
