@@ -14,43 +14,42 @@ The gRPC service that provides a query to [maxminddb](https://docs.rs/crate/maxm
 
 ```
 ❯ mmdb-server --help
-mmdb-grpc x.y.z
-Takeru Sato <type.in.type@gmail.com>
+The gRPC service that provides a query to Maxmind's GeoLite2 databases
 
-USAGE:
-    mmdb-server [OPTIONS]
+Usage: mmdb-server [OPTIONS]
 
-FLAGS:
-        --help       Prints help information
-    -V, --version    Prints version information
+Options:
+  -H, --host <HOST>
+          [default: localhost]
+  -P, --port <PORT>
+          [default: 50000]
+  -F, --file <MMDB_PATH>
+          [default: /usr/share/GeoIP/GeoLite2-City.mmdb]
+  -W, --workers <WORKERS>
+          [default: 1]
+      --slots-per-worker <SLOTS_PER_WORKER>
+          
+      --keepalive-time <KEEPALIVE_TIME>
+          
+      --keepalive-timeout <KEEPALIVE_TIMEOUT>
+          
+      --keepalive-permit-without-calls <KEEPALIVE_PERMIT_WITHOUT_CALLS>
+          [possible values: true, false]
+  -h, --help
+          Print help
+  -V, --version
+          Print version
 
-OPTIONS:
-    -h, --host <host>                                                        [default: localhost]
-        --keepalive-permit-without-calls <keepalive-permit-without-calls>
-        --keepalive-time <keepalive-time>
-        --keepalive-timeout <keepalive-timeout>
-    -f, --file <mmdb-path>
-            [default: /usr/share/GeoIP/GeoLite2-City.mmdb]
-
-    -p, --port <port>                                                        [default: 50000]
-        --slots-per-worker <slots-per-worker>
-    -w, --workers <workers>                                                  [default: 1]
 ```
 
 ```
 ❯ mmdb-reload --help
-mmdb-grpc x.y.z
-Takeru Sato <type.in.type@gmail.com>
+Usage: mmdb-reload [OPTIONS]
 
-USAGE:
-    mmdb-reload [OPTIONS]
-
-FLAGS:
-        --help       Prints help information
-    -V, --version    Prints version information
-
-OPTIONS:
-    -h, --host <host>             [default: localhost]
-    -p, --port <port>             [default: 50000]
-    -s, --schedule <schedule>
+Options:
+  -H, --host <HOST>          [default: localhost]
+  -P, --port <PORT>          [default: 50000]
+  -S, --schedule <SCHEDULE>  
+  -h, --help                 Print help
+  -V, --version              Print version
 ```
