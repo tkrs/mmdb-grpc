@@ -4,7 +4,7 @@ WORKDIR /tmp
 
 RUN apt-get -qq update && apt-get -qq install -y curl
 
-RUN curl -L -o grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.2/grpc_health_probe-linux-amd64 && \
+RUN curl -L -o grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.24/grpc_health_probe-linux-amd64 && \
   chmod +x grpc_health_probe
 
 FROM ubuntu:22.04
