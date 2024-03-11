@@ -48,7 +48,7 @@ jobs:
           SCCACHE_GHA_ENABLED: "true"
           RUSTC_WRAPPER: sccache
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ steps.release_context.outputs.tag_name }}
           tag_name: ${{ steps.release_context.outputs.tag_name }}
