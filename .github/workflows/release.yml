@@ -37,7 +37,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           cache-directories: ~/.cache/sccache
-      - uses: mozilla-actions/sccache-action@v0.0.4
+      - uses: mozilla-actions/sccache-action@v0.0.5
       - name: Install cargo-release
         uses: taiki-e/install-action@v2
         with:
