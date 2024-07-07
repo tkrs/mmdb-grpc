@@ -9,6 +9,7 @@ use log::{debug, error};
 use maxminddb::{self, geoip2, MaxMindDBError, Metadata};
 use spin::RwLock;
 use std::collections::{BTreeMap, HashMap, HashSet};
+use std::fmt::Display;
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -98,19 +99,20 @@ where
     }
 }
 
-impl ToString for Message_Locale {
-    fn to_string(&self) -> String {
-        match self {
-            Message_Locale::BRAZLIAN_PORTUGUESE => "pt-BR".into(),
-            Message_Locale::ENGLISH => "en".into(),
-            Message_Locale::FRENCH => "fr".into(),
-            Message_Locale::GERMAN => "de".into(),
-            Message_Locale::JAPANESE => "ja".into(),
-            Message_Locale::RUSSIAN => "ru".into(),
-            Message_Locale::SIMPLIFIED_CHINESE => "zh-CN".into(),
-            Message_Locale::SPANISH => "es".into(),
-            Message_Locale::UNSPECIFIED => "".into(), // TODO: should it panic?
-        }
+impl Display for Message_Locale {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let data = match self {
+            Message_Locale::BRAZLIAN_PORTUGUESE => "pt-BR",
+            Message_Locale::ENGLISH => "en",
+            Message_Locale::FRENCH => "fr",
+            Message_Locale::GERMAN => "de",
+            Message_Locale::JAPANESE => "ja",
+            Message_Locale::RUSSIAN => "ru",
+            Message_Locale::SIMPLIFIED_CHINESE => "zh-CN",
+            Message_Locale::SPANISH => "es",
+            Message_Locale::UNSPECIFIED => "", // TODO: should it panic?
+        };
+        f.write_str(data)
     }
 }
 
